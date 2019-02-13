@@ -7,6 +7,7 @@ import com.example.rio.kottlin_demo.di.anotation.ViewModelFactory1
 import com.example.rio.kottlin_demo.di.anotation.ViewModelKey
 import com.example.rio.kottlin_demo.ui.login.LoginViewModel
 import com.example.rio.kottlin_demo.ui.main.MainViewModel
+import com.example.rio.kottlin_demo.ui.register.RegisterViewModel
 import com.example.rio.kottlin_demo.ui.splash.SplashViewModel
 import dagger.Binds
 import dagger.Module
@@ -31,6 +32,11 @@ abstract class ViewModelModule{
     @IntoMap
     @ViewModelKey(LoginViewModel::class)
     abstract fun bindsLoginViewModel(loginViewModel: LoginViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(RegisterViewModel::class)
+    abstract fun bindsRegisterViewModel(registerViewModel: RegisterViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(viewModelFactory: ViewModelFactory): ViewModelProvider.Factory

@@ -6,11 +6,11 @@ import com.example.rio.kottlin_demo.utils.SingleLiveEvent
 import javax.inject.Inject
 
 class SplashViewModel @Inject constructor(private var appDataManager: AppDataManager) :
-    BaseViewModel<SplashDataView>() {
+    BaseViewModel<SplashViewData>() {
 
     private val toLogin: SingleLiveEvent<Void>
     private val toMain: SingleLiveEvent<Void>
-    private var splashDataView:SplashDataView
+    private var splashViewData:SplashViewData
 
     fun getToLoginEvent(): SingleLiveEvent<Void> {
         return toLogin
@@ -21,14 +21,14 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
     }
 
     init {
-        splashDataView = SplashDataView()
+        splashViewData = SplashViewData()
         setDataView()
         toLogin= SingleLiveEvent()
         toMain= SingleLiveEvent()
     }
 
     fun setDataView(){
-        viewData.setValue(splashDataView)
+        viewData.setValue(splashViewData)
     }
 
     fun checkLogin(){
