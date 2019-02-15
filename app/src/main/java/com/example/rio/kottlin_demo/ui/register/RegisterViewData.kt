@@ -11,4 +11,9 @@ class RegisterViewData : BaseViewData(){
     var isVisibilityEtNameCode:Boolean=false
     var isVisibilityEtPassCode:Boolean=false
     var isVisibilityBtnRegister:Boolean=false
+    var message:String=""
+    var phone:String=""
+    var code:String=""
+    var verificationId:String=""
+    var forceResendingToken:String=""
 }
