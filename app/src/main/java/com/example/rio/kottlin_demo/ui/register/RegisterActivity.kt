@@ -57,14 +57,10 @@ class RegisterActivity : BaseActivity<RegisterViewModel>() {
             finish()
         })
 
-        viewModel.onLoadingEvent().observe(this, Observer {
-            if (viewModel.registerViewData.isShowLoading)
+        viewModel.onLoadingEvent().observe(this, Observer {t->
+            if (t!!)
                 showLoading()
             else hideLoading()
-        })
-
-        viewModel.onGetCodeClickEvent().observe(this, Observer {
-
         })
 
         viewModel.onShowMessageEvent().observe(this, Observer {

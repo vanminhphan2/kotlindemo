@@ -27,6 +27,7 @@ class LoginActivity : BaseActivity<LoginViewModel>() {
 
         getViewReferences()
         registerEvents()
+        initializeViews()
     }
 
     override fun getViewReferences() {
@@ -36,29 +37,46 @@ class LoginActivity : BaseActivity<LoginViewModel>() {
     }
 
     override fun initializeViews() {
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            FirebaseAuth.getInstance().signOut()
+            Log.e("Rio", "currentUser da login  :")
+        } else
+            Log.e("Rio", "currentUser chuaaa login  :")
+
 
     }
 
     override fun registerEvents() {
-        viewModel.getToRegisterEvent().observe(this, Observer {
 
+        viewModel.getViewData().observe(this, Observer {
+            activityLoginBinding.viewModel = viewModel
+        })
+
+        viewModel.getToRegisterEvent().observe(this, Observer {
             val starter = Intent(this@LoginActivity, RegisterActivity::class.java)
             startActivityForResult(starter,AppConstants.REQUEST_CODE_TO_REGISTER_ACTIVITY)
         })
+
+        viewModel.getToMainEvent().observe(this, Observer {
+            val starter = Intent(this@LoginActivity, MainActivity::class.java)
+            startActivity(starter)
+        })
+
+        viewModel.onLoadingEvent().observe(this, Observer {t->
+            if (t!!)
+                showLoading()
+            else hideLoading()
+        })
+
+        viewModel.onShowMessageEvent().observe(this, Observer {
+            Toast.makeText(this, viewModel.loginViewData.message, Toast.LENGTH_SHORT).show()
+        })
+
+
     }
 
     override fun observeDataChange() {
 
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (FirebaseAuth.getInstance().currentUser != null) {
-
-//            FirebaseAuth.getInstance().signOut()
-            Log.e("Rio", "currentUser da login  :")
-        } else
-            Log.e("Rio", "currentUser chuaaa login  :")
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

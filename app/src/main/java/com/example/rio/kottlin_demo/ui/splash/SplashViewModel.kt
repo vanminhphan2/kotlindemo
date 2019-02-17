@@ -62,7 +62,8 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
                                 val phone = map["phone"].toString()
                                 val pass = map["pass"].toString()
                                 user = User(id, userName, phone, pass)
-                                getToMainEvent().call()
+//                                getToMainEvent().call()
+                                getToLoginEvent().call()
                             } else {
                                 Log.e("Rio", "loi map is Map<*, *>")
                                 getToLoginEvent().call()

@@ -27,22 +27,11 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
     val myRef = database.getReference("users")
 
     private val onRegisterClick: SingleLiveEvent<Void>
-    private val onGetCodeClick: SingleLiveEvent<Void>
-    private val onShowMessage: SingleLiveEvent<Void>
     private val onVerifyCode: SingleLiveEvent<Void>
     private val onReceiveCode: SingleLiveEvent<Void>
-    private val onLoading: SingleLiveEvent<Void>
 
     fun onRegisterSuccessEvent(): SingleLiveEvent<Void> {
         return onRegisterClick
-    }
-
-    fun onGetCodeClickEvent(): SingleLiveEvent<Void> {
-        return onGetCodeClick
-    }
-
-    fun onShowMessageEvent(): SingleLiveEvent<Void> {
-        return onShowMessage
     }
 
     fun onVerifyCodeEvent(): SingleLiveEvent<Void> {
@@ -53,18 +42,13 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
         return onReceiveCode
     }
 
-    fun onLoadingEvent(): SingleLiveEvent<Void> {
-        return onLoading
-    }
     init {
         registerViewData= RegisterViewData()
         setDataView()
         onRegisterClick= SingleLiveEvent()
-        onGetCodeClick= SingleLiveEvent()
         onShowMessage= SingleLiveEvent()
         onVerifyCode= SingleLiveEvent()
         onReceiveCode= SingleLiveEvent()
-        onLoading= SingleLiveEvent()
     }
 
     fun setDataView(){
@@ -72,7 +56,6 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
     }
 
     fun onRegisterClick(){
-//        onRegisterSuccessEvent().call()
         if(registerViewData.name.length<3)
         {
             registerViewData.message="Name is incorrect!"
@@ -233,13 +216,4 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
         registerViewData.pass=pass.toString()
     }
 
-    fun showLoading(){
-        registerViewData.isShowLoading=true
-        onLoadingEvent().call()
-    }
-
-    fun hideLoading(){
-        registerViewData.isShowLoading=false
-        onLoadingEvent().call()
-    }
 }

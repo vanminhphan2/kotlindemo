@@ -5,7 +5,6 @@ import com.example.rio.kottlin_demo.ui.base.BaseViewData
 
 class RegisterViewData : BaseViewData(){
 
-    var isShowLoading:Boolean=false
     var isEnabledEtPhone:Boolean=true
     var isVisibilityBtnGetCode:Boolean=true
     var isVisibilityEtCode:Boolean=false
