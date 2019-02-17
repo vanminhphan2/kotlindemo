@@ -155,7 +155,8 @@
                             android:singleLine="true"
                             android:paddingBottom="10dp"
                             android:textColor="@color/black_effective"
-                            android:textSize="18sp"/>
+                            android:textSize="18sp"
+                            android:afterTextChanged="@{(value) -> viewModel.updateName(value)}" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -185,7 +186,8 @@
                             android:maxLength="50"
                             android:paddingBottom="10dp"
                             android:textColor="@color/black_effective"
-                            android:textSize="18sp"/>
+                            android:textSize="18sp"
+                            android:afterTextChanged="@{(value) -> viewModel.updatePass(value)}" />
 
                 </android.support.design.widget.TextInputLayout>
 

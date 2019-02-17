@@ -7,14 +7,17 @@ import android.os.Bundle
 import com.example.rio.kottlin_demo.R
 import com.example.rio.kottlin_demo.databinding.ActivityRegisterBinding
 import com.example.rio.kottlin_demo.ui.base.BaseActivity
-import com.example.rio.kottlin_demo.ui.main.MainActivity
-import android.content.Intent
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.*
+import android.app.Activity
+import android.nfc.NfcAdapter.EXTRA_DATA
+import android.content.Intent
+
+
+
+
 
 
 class RegisterActivity : BaseActivity<RegisterViewModel>() {
@@ -45,30 +48,27 @@ class RegisterActivity : BaseActivity<RegisterViewModel>() {
             activityRegisterBinding.viewModel = viewModel
         })
 
-//        activityRegisterBinding.etCode.addTextChangedListener(w:TextWatcher)
+        viewModel.onRegisterSuccessEvent().observe(this, Observer {
+            hideLoading()
+            Log.e("Rio", "onRegisterSuccessEvent: okokokokook")
+            var data = Intent()
+            data.putExtra("INFO_USER", viewModel.userInfo)
+            setResult(Activity.RESULT_OK, data)
+            finish()
+        })
 
-//        editText.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-//
-//            }
-//
-//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-//
-//            }
-//
-//            override fun afterTextChanged(s: Editable) {
-//
-//            }
-//        })
-
-        viewModel.onRegisterClickEvent().observe(this, Observer { })
+        viewModel.onLoadingEvent().observe(this, Observer {
+            if (viewModel.registerViewData.isShowLoading)
+                showLoading()
+            else hideLoading()
+        })
 
         viewModel.onGetCodeClickEvent().observe(this, Observer {
 
         })
 
         viewModel.onShowMessageEvent().observe(this, Observer {
-            Toast.makeText(this,viewModel.registerViewData.message,Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, viewModel.registerViewData.message, Toast.LENGTH_SHORT).show()
         })
 
         viewModel.onVerifyCodeEvent().observe(this, Observer {
@@ -78,7 +78,7 @@ class RegisterActivity : BaseActivity<RegisterViewModel>() {
 
         viewModel.onReceiveCodeEvent().observe(this, Observer {
 
-           activityRegisterBinding.etCode.setText(viewModel.registerViewData.code)
+            activityRegisterBinding.etCode.setText(viewModel.registerViewData.code)
         })
     }
 
@@ -87,10 +87,12 @@ class RegisterActivity : BaseActivity<RegisterViewModel>() {
     }
 
     private fun verifyVerificationCode() {
-        //creating the credential
-
-        Log.e("Rio", "verifyVerificationCode  :"+viewModel.registerViewData.phone+"---code: "+viewModel.registerViewData.code)
-        val credential = PhoneAuthProvider.getCredential(viewModel.registerViewData.phone, viewModel.registerViewData.code)
+        Log.e(
+            "Rio",
+            "verifyVerificationCode  :" + viewModel.registerViewData.verificationId + "---code: " + viewModel.registerViewData.code
+        )
+        val credential =
+            PhoneAuthProvider.getCredential(viewModel.registerViewData.verificationId, viewModel.registerViewData.code)
         //signing the user
         signInWithPhoneAuthCredential(credential)
     }
@@ -101,25 +103,21 @@ class RegisterActivity : BaseActivity<RegisterViewModel>() {
                 OnCompleteListener<AuthResult> { task ->
                     if (task.isSuccessful) {
 
-                        Log.e("Rio", "task.isSuccessful  :")
-                        //verification successful we will start the profile activity
-//                        val intent = Intent(this@VerifyPhoneActivity, ProfileActivity::class.java)
-//                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//                        startActivity(intent)
+                        Log.e("Rio", "task.isSuccessful  id: "+ firebaseAuth.getCurrentUser()!!.uid)
+                        viewModel.registerViewData.idUser = firebaseAuth.getCurrentUser()!!.uid
+                        viewModel.verifySuccess()
                     } else {
-
-                        Log.e("Rio", "task.exception  :"+task.exception)
-                        //verification unsuccessful.. display an error message
+                        Log.e("Rio", "task.exception  :" + task.exception)
                         var message = "Somthing is wrong, we will fix it soon..."
                         if (task.exception is FirebaseAuthInvalidCredentialsException) {
                             message = "Invalid code entered..."
                         }
-//                        val snackbar = Snackbar.make(findViewById(R.id.parent), message, Snackbar.LENGTH_LONG)
-//                        snackbar.setAction("Dismiss", object : View.OnClickListener() {
-//                            fun onClick(v: View) {}
-//                        })
-//                        snackbar.show()
                     }
                 })
+    }
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_CANCELED)
+        super.onBackPressed()
     }
 }

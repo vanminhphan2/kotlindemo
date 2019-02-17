@@ -48,4 +48,11 @@ abstract class BaseActivity<T : Any> : AppCompatActivity(){
         if (loadingDialog != null)
             loadingDialog.hide()
     }
+
+    public override fun onDestroy() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.cancel()
+        }
+        super.onDestroy()
+    }
 }

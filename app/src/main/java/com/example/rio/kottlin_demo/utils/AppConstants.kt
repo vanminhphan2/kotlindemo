@@ -25,4 +25,6 @@ object AppConstants {
     val SETTING_INTENT = 20
     val REQUEST_CODE_CHOOSE_FROM_GALLERY = 21
     val REQUEST_CODE_CHOOSE_FROM_EDIT = 22
+
+    val REQUEST_CODE_TO_REGISTER_ACTIVITY = 2
 }// This utility class is not publicly instantiable
