@@ -9,16 +9,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AppDataManager:DataManager {
-
-    private val mPreferencesHelper: PreferencesHelper
+class AppDataManager @Inject constructor(
+    private val mPreferencesHelper: PreferencesHelper,
     private val mDbHelper: DbHelper
-
-    @Inject
-    constructor(mPreferencesHelper: PreferencesHelper, mDbHelper: DbHelper) {
-        this.mPreferencesHelper = mPreferencesHelper
-        this.mDbHelper = mDbHelper
-    }
+) :DataManager {
 
 
     override fun getAllUsers(): Observable<MutableList<User>> {

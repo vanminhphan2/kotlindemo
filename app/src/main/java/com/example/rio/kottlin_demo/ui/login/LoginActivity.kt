@@ -37,11 +37,11 @@ class LoginActivity : BaseActivity<LoginViewModel>() {
     }
 
     override fun initializeViews() {
-        if (FirebaseAuth.getInstance().currentUser != null) {
-            FirebaseAuth.getInstance().signOut()
-            Log.e("Rio", "currentUser da login  :")
-        } else
-            Log.e("Rio", "currentUser chuaaa login  :")
+//        if (FirebaseAuth.getInstance().currentUser != null) {
+//            FirebaseAuth.getInstance().signOut()
+//            Log.e("Rio", "currentUser da login  :")
+//        } else
+//            Log.e("Rio", "currentUser chuaaa login  :")
 
 
     }

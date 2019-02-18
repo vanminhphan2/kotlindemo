@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.rio.kottlin_demo.data.AppDataManager
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
+import com.example.rio.kottlin_demo.utils.AppConstants
 import com.example.rio.kottlin_demo.utils.SingleLiveEvent
 import com.google.firebase.FirebaseException
 import java.util.concurrent.TimeUnit
@@ -25,6 +26,7 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
     var registerViewData:RegisterViewData
     val database = FirebaseDatabase.getInstance()
     val myRef = database.getReference("users")
+    val myRefSession = database.getReference("sessions")
 
     private val onRegisterClick: SingleLiveEvent<Void>
     private val onVerifyCode: SingleLiveEvent<Void>
@@ -67,6 +69,10 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
             myRef.child(registerViewData.idUser).child("isUpdateInfo").setValue(true)
             myRef.child(registerViewData.idUser).child("name").setValue(registerViewData.name)
             myRef.child(registerViewData.idUser).child("pass").setValue(registerViewData.pass)
+//            myRef.child(registerViewData.idUser).child("forceResendingToken").setValue(registerViewData.forceResendingToken)
+            val token=AppConstants.generateTokenString()
+            myRefSession.child(token).setValue(registerViewData.phone)
+            appDataManager.setLoginToken(token)
             userInfo=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
             onRegisterSuccessEvent().call()
         }
@@ -216,4 +222,7 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
         registerViewData.pass=pass.toString()
     }
 
+    fun updateCode(code: Editable) {
+        registerViewData.code=code.toString()
+    }
 }

@@ -6,21 +6,35 @@ import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import com.example.rio.kottlin_demo.R
 import dagger.android.AndroidInjection
+import dagger.android.support.HasSupportFragmentInjector
 import javax.inject.Inject
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.AndroidInjector
 
-abstract class BaseActivity<T : Any> : AppCompatActivity(){
+
+
+
+
+abstract class BaseActivity<V : Any> : AppCompatActivity(), HasSupportFragmentInjector {
 
     @Inject
     protected lateinit var viewModelFactory: ViewModelProvider.Factory
 
     protected lateinit var loadingDialog: Dialog
 
+    @Inject
+    lateinit var fragmentAndroidInjector: DispatchingAndroidInjector<Fragment>
 
-    protected lateinit var viewModel: T
+    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
+        return fragmentAndroidInjector
+    }
+
+    protected lateinit var viewModel: V
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

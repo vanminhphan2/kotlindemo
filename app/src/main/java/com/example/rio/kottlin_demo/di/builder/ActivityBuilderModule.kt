@@ -19,7 +19,7 @@ abstract class ActivityBuilderModule {
     @ActivityScope
     abstract fun splashActivity():SplashActivity
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [FragmentBuilderModule::class])
     @ActivityScope
     abstract fun mainActivity():MainActivity
 

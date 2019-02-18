@@ -18,6 +18,7 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
     var user: User? = null
     val database = FirebaseDatabase.getInstance()
     val myRef = database.getReference("users")
+    val myRefSession = database.getReference("sessions")
     private val toLogin: SingleLiveEvent<Void>
     private val toMain: SingleLiveEvent<Void>
     private var splashViewData: SplashViewData
@@ -42,50 +43,128 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
     }
 
     fun checkLogin() {
-//        if(appDataManager.getLoginToken().equals("")||appDataManager.getLoginToken()==null){
+        Log.e("Rio", "123 123 123 :"+appDataManager.getLoginToken())
+        if(appDataManager.getLoginToken().equals("")||appDataManager.getLoginToken()==null){
+            getToLoginEvent().call()
+        }
+        else{
+            var phone=""
+            myRefSession.child(appDataManager.getLoginToken().toString()).addValueEventListener(object :ValueEventListener{
+                override fun onCancelled(p0: DatabaseError) {
+                   Log.e("Rio ","loi get data Session")
+                }
+
+                override fun onDataChange(p0: DataSnapshot) {
+                    if (p0.getValue() != null) {
+                       phone = p0.getValue().toString()
+                        Log.e("Rio ","phone : "+ p0.getValue().toString())
+                        getInfoUser(phone)
+                    }
+                    else{
+                        getToLoginEvent().call()
+                        Log.e("Rio ","ko co token!")
+                    }
+                    myRefSession.removeEventListener(this);
+                }
+
+            })
+//            if(!phone.equals("")){
+//
+//                Log.e("Rio", "currentUser da login  :")
+//            }
+//            else{
+//                Log.e("Rio", "currentUser chuaurrentUser chuaaa logi 1111223232  :")
+//                getToLoginEvent().call()
+//            }
+        }
+
+//        if (FirebaseAuth.getInstance().currentUser != null) {
+//            myRef.child(FirebaseAuth.getInstance().currentUser!!.uid)
+//                .addValueEventListener(object : ValueEventListener {
+//                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                        if (dataSnapshot.getValue() != null) {
+//                            val map = dataSnapshot.getValue()
+//
+//                            if (map is Map<*, *>) {
+//                                val id = map["idUser"].toString()
+//                                val userName = map["name"].toString()
+//                                val phone = map["phone"].toString()
+//                                val pass = map["pass"].toString()
+//                                user = User(id, userName, phone, pass)
+////                                getToMainEvent().call()
+//                                getToLoginEvent().call()
+//                            } else {
+//                                Log.e("Rio", "loi map is Map<*, *>")
+//                                getToLoginEvent().call()
+//                            }
+//
+//                        } else {
+//                            getToLoginEvent().call()
+//                            Log.e("Rio", "dataSnapshot.getValue() USER INFO IN SERVER null")
+//
+//                        }
+//                        myRef.removeEventListener(this);
+//                    }
+//
+//                    override fun onCancelled(error: DatabaseError) {
+//                        // Failed to read value
+//                        Log.e("Rio", "Failed to read value.", error.toException())
+//                    }
+//                })
+//            Log.e("Rio", "currentUser da login  :")
+//        } else {
+//            Log.e("Rio", "currentUser chuaaa login  :")
 //            getToLoginEvent().call()
 //        }
-//        else{
-//            getToMainEvent().call()
-//        }
+    }
 
-        if (FirebaseAuth.getInstance().currentUser != null) {
-            myRef.child(FirebaseAuth.getInstance().currentUser!!.uid)
-                .addValueEventListener(object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        if (dataSnapshot.getValue() != null) {
-                            val map = dataSnapshot.getValue()
+    fun getInfoUser(phone:String){
+        myRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.getValue() != null) {
+
+                    var isHaveAccount=false
+                    for (snapshot in dataSnapshot.getChildren()) {
+                        if( snapshot.child("phone").value!!.equals(phone)){
+                            Log.e("Rio", "have phone......")
+                            isHaveAccount=true
+                            val map = snapshot.getValue()
 
                             if (map is Map<*, *>) {
                                 val id = map["idUser"].toString()
                                 val userName = map["name"].toString()
-                                val phone = map["phone"].toString()
                                 val pass = map["pass"].toString()
                                 user = User(id, userName, phone, pass)
+                                Log.e("Rio", "have phone......1111")
 //                                getToMainEvent().call()
-                                getToLoginEvent().call()
-                            } else {
-                                Log.e("Rio", "loi map is Map<*, *>")
-                                getToLoginEvent().call()
+//                                            getToLoginEvent().call()
                             }
 
-                        } else {
-                            getToLoginEvent().call()
-                            Log.e("Rio", "dataSnapshot.getValue() USER INFO IN SERVER null")
-
                         }
+                    }
+                    if(isHaveAccount){
+                        getToMainEvent().call()
+                        Log.e("Rio", "currentUser da login  :")
+                        myRef.removeEventListener(this);
+                    }else {
+                        Log.e("Rio", "loi map is Map<*, *>")
+                        getToLoginEvent().call()
                         myRef.removeEventListener(this);
                     }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        // Failed to read value
-                        Log.e("Rio", "Failed to read value.", error.toException())
-                    }
-                })
-            Log.e("Rio", "currentUser da login  :")
-        } else {
-            Log.e("Rio", "currentUser chuaaa login  :")
-            getToLoginEvent().call()
-        }
+
+                } else {
+                    getToLoginEvent().call()
+                    Log.e("Rio", "dataSnapshot.getValue() USER INFO IN SERVER null")
+
+                }
+                myRef.removeEventListener(this);
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Failed to read value
+                Log.e("Rio", "Failed to read value.", error.toException())
+            }
+        })
     }
 }

@@ -6,12 +6,11 @@ import com.example.rio.kottlin_demo.di.builder.ActivityBuilderModule
 import com.example.rio.kottlin_demo.di.module.AppModule
 import dagger.BindsInstance
 import dagger.Component
-import dagger.android.AndroidInjectionModule
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AndroidInjectionModule::class, AppModule::class, ActivityBuilderModule::class])
+@Component(modules = [AndroidSupportInjectionModule::class, AppModule::class, ActivityBuilderModule::class])
 interface AppComponent{
 
     fun inject(app: MyApp)

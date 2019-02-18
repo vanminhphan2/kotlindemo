@@ -12,7 +12,6 @@ import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.*
 import android.app.Activity
-import android.nfc.NfcAdapter.EXTRA_DATA
 import android.content.Intent
 
 
@@ -69,7 +68,7 @@ class RegisterActivity : BaseActivity<RegisterViewModel>() {
 
         viewModel.onVerifyCodeEvent().observe(this, Observer {
 
-            verifyVerificationCode()
+            verifyCode()
         })
 
         viewModel.onReceiveCodeEvent().observe(this, Observer {
@@ -82,7 +81,7 @@ class RegisterActivity : BaseActivity<RegisterViewModel>() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    private fun verifyVerificationCode() {
+    private fun verifyCode() {
         Log.e(
             "Rio",
             "verifyVerificationCode  :" + viewModel.registerViewData.verificationId + "---code: " + viewModel.registerViewData.code
@@ -103,6 +102,8 @@ class RegisterActivity : BaseActivity<RegisterViewModel>() {
                         viewModel.registerViewData.idUser = firebaseAuth.getCurrentUser()!!.uid
                         viewModel.verifySuccess()
                     } else {
+                        hideLoading()
+                        Toast.makeText(this,"code is wrong!", Toast.LENGTH_SHORT).show()
                         Log.e("Rio", "task.exception  :" + task.exception)
                         var message = "Somthing is wrong, we will fix it soon..."
                         if (task.exception is FirebaseAuthInvalidCredentialsException) {

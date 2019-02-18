@@ -1,5 +1,10 @@
 package com.example.rio.kottlin_demo.utils
 
+import java.util.*
+import java.util.UUID.randomUUID
+
+
+
 object AppConstants {
 
     val API_STATUS_CODE_LOCAL_ERROR = 0
@@ -27,4 +32,9 @@ object AppConstants {
     val REQUEST_CODE_CHOOSE_FROM_EDIT = 22
 
     val REQUEST_CODE_TO_REGISTER_ACTIVITY = 2
+
+    fun generateTokenString(): String {
+        val uuid = UUID.randomUUID().toString()
+        return uuid
+    }
 }// This utility class is not publicly instantiable

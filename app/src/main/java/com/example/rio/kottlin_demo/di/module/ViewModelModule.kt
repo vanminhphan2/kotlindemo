@@ -3,10 +3,11 @@ package com.example.rio.kottlin_demo.di.module
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import com.example.rio.kottlin_demo.di.anotation.ViewModelFactory
-import com.example.rio.kottlin_demo.di.anotation.ViewModelFactory1
 import com.example.rio.kottlin_demo.di.anotation.ViewModelKey
 import com.example.rio.kottlin_demo.ui.login.LoginViewModel
 import com.example.rio.kottlin_demo.ui.main.MainViewModel
+import com.example.rio.kottlin_demo.ui.main.account.AccountViewModel
+import com.example.rio.kottlin_demo.ui.main.boxs.BoxsViewModel
 import com.example.rio.kottlin_demo.ui.register.RegisterViewModel
 import com.example.rio.kottlin_demo.ui.splash.SplashViewModel
 import dagger.Binds
@@ -37,6 +38,16 @@ abstract class ViewModelModule{
     @IntoMap
     @ViewModelKey(RegisterViewModel::class)
     abstract fun bindsRegisterViewModel(registerViewModel: RegisterViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(BoxsViewModel::class)
+    abstract fun bindsBoxsViewModel(boxsViewModel: BoxsViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AccountViewModel::class)
+    abstract fun bindsAccountViewModel(accountViewModel: AccountViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(viewModelFactory: ViewModelFactory): ViewModelProvider.Factory

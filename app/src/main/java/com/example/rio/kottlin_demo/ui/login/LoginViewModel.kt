@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.rio.kottlin_demo.data.AppDataManager
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
+import com.example.rio.kottlin_demo.utils.AppConstants
 import com.example.rio.kottlin_demo.utils.SingleLiveEvent
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -18,6 +19,7 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
     var loginViewData:LoginViewData
     val database = FirebaseDatabase.getInstance()
     val myRef = database.getReference("users")
+    val myRefSession = database.getReference("sessions")
     private val toRegister: SingleLiveEvent<Void>
     private val toMain: SingleLiveEvent<Void>
 
@@ -84,6 +86,10 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
                         }
                     }
                     if(phoneIsSuccess&&passIsSuccess){
+
+                        val token= AppConstants.generateTokenString()
+                        myRefSession.child(token).setValue(loginViewData.phone)
+                        appDataManager.setLoginToken(token)
                         getToMainEvent().call()
                         Log.e("Rio", "login is ok")
                     }
