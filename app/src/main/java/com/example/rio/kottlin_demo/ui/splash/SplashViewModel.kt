@@ -43,7 +43,7 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
     }
 
     fun checkLogin() {
-        Log.e("Rio", "123 123 123 :"+appDataManager.getLoginToken())
+        Log.e("Rio", "token: "+appDataManager.getLoginToken())
         if(appDataManager.getLoginToken().equals("")||appDataManager.getLoginToken()==null){
             getToLoginEvent().call()
         }
@@ -126,7 +126,6 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
                     var isHaveAccount=false
                     for (snapshot in dataSnapshot.getChildren()) {
                         if( snapshot.child("phone").value!!.equals(phone)){
-                            Log.e("Rio", "have phone......")
                             isHaveAccount=true
                             val map = snapshot.getValue()
 
@@ -135,7 +134,6 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
                                 val userName = map["name"].toString()
                                 val pass = map["pass"].toString()
                                 user = User(id, userName, phone, pass)
-                                Log.e("Rio", "have phone......1111")
 //                                getToMainEvent().call()
 //                                            getToLoginEvent().call()
                             }
@@ -144,7 +142,7 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
                     }
                     if(isHaveAccount){
                         getToMainEvent().call()
-                        Log.e("Rio", "currentUser da login  :")
+                        Log.e("Rio", "User da login  :")
                         myRef.removeEventListener(this);
                     }else {
                         Log.e("Rio", "loi map is Map<*, *>")
