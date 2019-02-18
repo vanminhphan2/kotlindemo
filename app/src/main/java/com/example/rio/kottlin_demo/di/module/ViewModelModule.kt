@@ -8,6 +8,7 @@ import com.example.rio.kottlin_demo.ui.login.LoginViewModel
 import com.example.rio.kottlin_demo.ui.main.MainViewModel
 import com.example.rio.kottlin_demo.ui.main.account.AccountViewModel
 import com.example.rio.kottlin_demo.ui.main.boxs.BoxsViewModel
+import com.example.rio.kottlin_demo.ui.main.search.SearchViewModel
 import com.example.rio.kottlin_demo.ui.register.RegisterViewModel
 import com.example.rio.kottlin_demo.ui.splash.SplashViewModel
 import dagger.Binds
@@ -48,6 +49,11 @@ abstract class ViewModelModule{
     @IntoMap
     @ViewModelKey(AccountViewModel::class)
     abstract fun bindsAccountViewModel(accountViewModel: AccountViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(SearchViewModel::class)
+    abstract fun bindsSearchViewModel(searchViewModel: SearchViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(viewModelFactory: ViewModelFactory): ViewModelProvider.Factory

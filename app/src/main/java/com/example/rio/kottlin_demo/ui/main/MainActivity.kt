@@ -24,6 +24,7 @@ import android.databinding.adapters.CompoundButtonBindingAdapter.setChecked
 import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.MenuItem
+import com.example.rio.kottlin_demo.ui.main.search.SearchFragment
 
 
 class MainActivity :BaseActivity<MainViewModel>() {
@@ -31,16 +32,21 @@ class MainActivity :BaseActivity<MainViewModel>() {
     private lateinit var activityMainBinding: ActivityMainBinding
     private lateinit var boxsFragment:BoxsFragment
     private lateinit var accountFragment: AccountFragment
-    private lateinit var prevMenuItem: MenuItem
+    private lateinit var searchFragment: SearchFragment
+//    private lateinit var prevMenuItem: MenuItem
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
-            R.id.navigation_box -> {
+            R.id.navigation_search -> {
                 activityMainBinding.viewpager.setCurrentItem(0);
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.navigation_account -> {
+            R.id.navigation_box -> {
                 activityMainBinding.viewpager.setCurrentItem(1);
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_account -> {
+                activityMainBinding.viewpager.setCurrentItem(2);
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -65,24 +71,36 @@ class MainActivity :BaseActivity<MainViewModel>() {
     override fun initializeViews() {
         boxsFragment= BoxsFragment()
         accountFragment=AccountFragment()
-        val array = arrayOf(boxsFragment,accountFragment)
+        searchFragment= SearchFragment()
+        val array = arrayOf(searchFragment,boxsFragment,accountFragment)
         val list = Arrays.asList(*array)
         val adapter = ViewPagerAdapter(supportFragmentManager,list)
         activityMainBinding.viewpager.setAdapter(adapter)
-        prevMenuItem = activityMainBinding.navigation.getMenu().getItem(0)
+        activityMainBinding.viewpager.setCurrentItem(1);
+//        prevMenuItem = activityMainBinding.navigation.getMenu().getItem(1)
+        activityMainBinding.navigation.getMenu().getItem(1).setChecked(true)
         activityMainBinding.viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
             }
 
             override fun onPageSelected(position: Int) {
-//                Log.e("Rio","onPageSelected")
-                if (prevMenuItem != null)
-                    prevMenuItem.setChecked(false)
-                else
-                    activityMainBinding.navigation.getMenu().getItem(0).setChecked(false)
+                Log.e("Rio","onPageSelected pos: "+position)
+               when(position) {
 
+                   0 -> {
+                       activityMainBinding.navigation.getMenu().getItem(1).setChecked(false)
+                       activityMainBinding.navigation.getMenu().getItem(2).setChecked(false)
+                   }
+                   1 -> {
+                       activityMainBinding.navigation.getMenu().getItem(0).setChecked(false)
+                       activityMainBinding.navigation.getMenu().getItem(2).setChecked(false)
+                   }
+                   else -> {
+                       activityMainBinding.navigation.getMenu().getItem(0).setChecked(false)
+                       activityMainBinding.navigation.getMenu().getItem(1).setChecked(false)
+                   }
+               }
                 activityMainBinding.navigation.getMenu().getItem(position).setChecked(true)
-                prevMenuItem = activityMainBinding.navigation.getMenu().getItem(position)
             }
 
             override fun onPageScrollStateChanged(state: Int) {
