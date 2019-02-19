@@ -13,10 +13,8 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.*
 import android.app.Activity
 import android.content.Intent
-
-
-
-
+import com.example.rio.kottlin_demo.MyApp
+import com.example.rio.kottlin_demo.utils.AppConstants
 
 
 class RegisterActivity : BaseActivity<RegisterViewModel>() {
@@ -50,8 +48,8 @@ class RegisterActivity : BaseActivity<RegisterViewModel>() {
         viewModel.onRegisterSuccessEvent().observe(this, Observer {
             hideLoading()
             Log.e("Rio", "onRegisterSuccessEvent: okokokokook")
-            var data = Intent()
-            data.putExtra("INFO_USER", viewModel.userInfo)
+            val data = Intent()
+//            data.putExtra(AppConstants.INFO_USER_KEY, viewModel.registerViewData.user)
             setResult(Activity.RESULT_OK, data)
             finish()
         })

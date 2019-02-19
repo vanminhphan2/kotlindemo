@@ -1,6 +1,7 @@
 package com.example.rio.kottlin_demo.di.builder
 
 import com.example.rio.kottlin_demo.di.anotation.ActivityScope
+import com.example.rio.kottlin_demo.ui.chat.ChatActivity
 import com.example.rio.kottlin_demo.ui.login.LoginActivity
 import com.example.rio.kottlin_demo.ui.main.MainActivity
 import com.example.rio.kottlin_demo.ui.register.RegisterActivity
@@ -30,5 +31,9 @@ abstract class ActivityBuilderModule {
     @ContributesAndroidInjector
     @ActivityScope
     abstract fun registerActivity():RegisterActivity
+
+    @ContributesAndroidInjector
+    @ActivityScope
+    abstract fun chatActivity():ChatActivity
 
 }

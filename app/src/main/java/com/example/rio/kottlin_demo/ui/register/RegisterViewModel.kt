@@ -2,6 +2,7 @@ package com.example.rio.kottlin_demo.ui.register
 
 import android.text.Editable
 import android.util.Log
+import com.example.rio.kottlin_demo.MyApp
 import com.example.rio.kottlin_demo.data.AppDataManager
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
@@ -21,8 +22,6 @@ import com.google.firebase.database.ValueEventListener
 
 class RegisterViewModel @Inject constructor(private var appDataManager: AppDataManager) : BaseViewModel<RegisterViewData>(){
 
-
-    var userInfo: User? = null
     var registerViewData:RegisterViewData
     val database = FirebaseDatabase.getInstance()
     val myRef = database.getReference("users")
@@ -73,7 +72,8 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
             val token=AppConstants.generateTokenString()
             myRefSession.child(token).setValue(registerViewData.phone)
             appDataManager.setLoginToken(token)
-            userInfo=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
+//            registerViewData.user=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
+            MyApp.myApp.userProfile=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
             onRegisterSuccessEvent().call()
         }
     }

@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import com.example.rio.kottlin_demo.di.anotation.ViewModelFactory
 import com.example.rio.kottlin_demo.di.anotation.ViewModelKey
+import com.example.rio.kottlin_demo.ui.chat.ChatViewModel
 import com.example.rio.kottlin_demo.ui.login.LoginViewModel
 import com.example.rio.kottlin_demo.ui.main.MainViewModel
 import com.example.rio.kottlin_demo.ui.main.account.AccountViewModel
@@ -54,6 +55,11 @@ abstract class ViewModelModule{
     @IntoMap
     @ViewModelKey(SearchViewModel::class)
     abstract fun bindsSearchViewModel(searchViewModel: SearchViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ChatViewModel::class)
+    abstract fun bindsChatViewModel(chatViewModel: ChatViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(viewModelFactory: ViewModelFactory): ViewModelProvider.Factory

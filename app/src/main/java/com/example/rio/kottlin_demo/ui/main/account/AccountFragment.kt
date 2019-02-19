@@ -3,6 +3,7 @@ package com.example.rio.kottlin_demo.ui.main.account
 
 import android.os.Bundle
 import android.arch.lifecycle.ViewModelProviders
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ class AccountFragment :  BaseFragment<AccountViewModel>() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.e("Rio ","onCreateView  AccountFragment")
         fragmentAccountBinding = FragmentAccountBinding.inflate(inflater, container, false)
         getViewReferences()
         return fragmentAccountBinding.getRoot()
@@ -29,15 +31,12 @@ class AccountFragment :  BaseFragment<AccountViewModel>() {
     }
 
     override fun initializeViews() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun registerEvents() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun observeDataChange() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 

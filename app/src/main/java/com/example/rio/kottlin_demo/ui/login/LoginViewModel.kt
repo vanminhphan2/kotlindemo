@@ -3,6 +3,7 @@ package com.example.rio.kottlin_demo.ui.login
 import android.text.Editable
 import android.util.Log
 import com.example.rio.kottlin_demo.data.AppDataManager
+import com.example.rio.kottlin_demo.data.firebase.FirebaseReferenceInstance
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
 import com.example.rio.kottlin_demo.utils.AppConstants
@@ -15,11 +16,7 @@ import javax.inject.Inject
 
 class LoginViewModel @Inject constructor(private var appDataManager: AppDataManager):BaseViewModel<LoginViewData>(){
 
-    var user: User? = null
     var loginViewData:LoginViewData
-    val database = FirebaseDatabase.getInstance()
-    val myRef = database.getReference("users")
-    val myRefSession = database.getReference("sessions")
     private val toRegister: SingleLiveEvent<Void>
     private val toMain: SingleLiveEvent<Void>
 
@@ -69,7 +66,7 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
     }
 
     fun onLoginServer(){
-        myRef.addValueEventListener(object : ValueEventListener {
+        FirebaseReferenceInstance.getUsersReference().addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.getValue() != null){
 
@@ -88,7 +85,7 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
                     if(phoneIsSuccess&&passIsSuccess){
 
                         val token= AppConstants.generateTokenString()
-                        myRefSession.child(token).setValue(loginViewData.phone)
+                        FirebaseReferenceInstance.getSessionsReference().child(token).setValue(loginViewData.phone)
                         appDataManager.setLoginToken(token)
                         getToMainEvent().call()
                         Log.e("Rio", "login is ok")
@@ -96,10 +93,10 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
                     else{
                         if(!phoneIsSuccess){
                             loginViewData.message="Phone is incorrect!"
-                            Log.e("Rio", "Phone is incorrect!")
+                            Log.e("Rio", "login phone is incorrect!")
                         }else{
                             loginViewData.message="Pass is incorrect!"
-                            Log.e("Rio", "Pass is incorrect!")
+                            Log.e("Rio", "login pass is incorrect!")
                         }
                         hideLoading()
                         onShowMessageEvent().call()
@@ -107,12 +104,12 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
                 }else{
                     Log.e("Rio", "dataSnapshot.getValue() null")
                 }
-                myRef.removeEventListener(this);
+                FirebaseReferenceInstance.getUsersReference().removeEventListener(this);
             }
 
             override fun onCancelled(error: DatabaseError) {
                 // Failed to read value
-                Log.e("Rio", "Failed to read value.", error.toException())
+                Log.e("Rio", "Failed to read value."+ error.message)
             }
         })
 

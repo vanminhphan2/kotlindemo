@@ -31,8 +31,10 @@ object AppConstants {
     val REQUEST_CODE_CHOOSE_FROM_GALLERY = 21
     val REQUEST_CODE_CHOOSE_FROM_EDIT = 22
 
-    val REQUEST_CODE_TO_REGISTER_ACTIVITY = 2
+    val INFO_USER_KEY = "INFO_USER"
+    val ID_USER_CHOOSE = "ID_USER_CHOOSE"
 
+    val REQUEST_CODE_TO_REGISTER_ACTIVITY = 2
     fun generateTokenString(): String {
         val uuid = UUID.randomUUID().toString()
         return uuid

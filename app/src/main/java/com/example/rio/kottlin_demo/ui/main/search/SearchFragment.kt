@@ -1,9 +1,12 @@
 package com.example.rio.kottlin_demo.ui.main.search
 
 
+import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +15,9 @@ import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.databinding.FragmentSearchBinding
 import com.example.rio.kottlin_demo.ui.adapter.ListSearchResultAdapter
 import com.example.rio.kottlin_demo.ui.base.BaseFragment
+import com.example.rio.kottlin_demo.ui.chat.ChatActivity
+import com.example.rio.kottlin_demo.utils.AppConstants
+import com.example.rio.kottlin_demo.utils.inf.MyCallBack
 
 class SearchFragment : BaseFragment<SearchViewModel>() {
 
@@ -23,9 +29,13 @@ class SearchFragment : BaseFragment<SearchViewModel>() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        Log.e("Rio ","onCreateView  SearchFragment")
         fragmentSearchBinding = FragmentSearchBinding.inflate(inflater, container, false)
         getViewReferences()
         initializeViews()
+        registerEvents()
+        observeDataChange()
         return fragmentSearchBinding.getRoot()
     }
 
@@ -37,20 +47,34 @@ class SearchFragment : BaseFragment<SearchViewModel>() {
     override fun initializeViews() {
 
         val layoutManager= LinearLayoutManager(context)
-        val user= User("123","rio pro kute so handsome ahihi","111","112")
-        val array :ArrayList<User> = arrayListOf(user,user,user,user,user,user,user,user,user,user,user,user,user,user)
-        listSearchResultAdapter= ListSearchResultAdapter(array,context)
+//        val user= User("123","rio pro kute so handsome ahihi","111","112")
+//        val array :ArrayList<User> = arrayListOf(user,user,user,user,user,user,user,user,user,user,user,user,user,user)
+        listSearchResultAdapter= ListSearchResultAdapter(viewModel.searchViewData.listUser,context)
         fragmentSearchBinding.recyclerListUser.layoutManager=layoutManager
         fragmentSearchBinding.recyclerListUser.adapter=listSearchResultAdapter
+        listSearchResultAdapter.setMyCallback(MyCallBack { t->
+            val idUSer:Int= t as Int
+            val starter = Intent(getBaseActivity(), ChatActivity::class.java)
+            starter.putExtra(AppConstants.ID_USER_CHOOSE,idUSer)
+            startActivity(starter)
+        })
     }
 
     override fun registerEvents() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        viewModel.getViewData().observe(this, Observer {
+            fragmentSearchBinding.viewModel = viewModel
+        })
+
+        viewModel.getUpdateListUserEvent().observe(this, Observer {
+//            Log.e("Rio ","getUpdateListUserEvent = "+viewModel.searchViewData.listUser.toString())
+            listSearchResultAdapter.setListData(viewModel.searchViewData.listUser)
+        })
+
     }
 
     override fun observeDataChange() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+       viewModel.getListUser()
     }
-
 
 }

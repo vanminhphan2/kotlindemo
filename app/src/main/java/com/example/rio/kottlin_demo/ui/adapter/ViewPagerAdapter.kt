@@ -8,13 +8,13 @@ import java.util.ArrayList
 
 class ViewPagerAdapter : FragmentStatePagerAdapter {
 
-    private var fragments: List<Fragment> = ArrayList()
+    private var fragments: ArrayList<Fragment> = ArrayList()
 
     constructor(fm: FragmentManager) : super(fm) {
-        // TODO Auto-generated constructor stub
+
     }
 
-    constructor(fm: FragmentManager, fragments: List<Fragment>) : super(fm) {
+    constructor(fm: FragmentManager, fragments: ArrayList<Fragment>) : super(fm) {
         this.fragments = fragments
     }
 
@@ -26,7 +26,7 @@ class ViewPagerAdapter : FragmentStatePagerAdapter {
       return  this.fragments.size
     }
 
-    fun setFragments(fragments: List<Fragment>) {
+    fun setFragments(fragments: ArrayList<Fragment>) {
         this.fragments = fragments
     }
 }

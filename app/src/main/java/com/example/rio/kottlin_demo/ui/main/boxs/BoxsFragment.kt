@@ -4,6 +4,7 @@ package com.example.rio.kottlin_demo.ui.main.boxs
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +24,7 @@ class BoxsFragment : BaseFragment<BoxsViewModel>() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
+        Log.e("Rio ","onCreateView  BoxsFragment")
         fragmentBoxsBinding = FragmentBoxsBinding.inflate(inflater, container, false)
         getViewReferences()
         initializeViews()

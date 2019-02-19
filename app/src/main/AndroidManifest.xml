@@ -28,6 +28,8 @@
                 android:name=".ui.test.TestActivity"
                 android:label="@string/title_activity_test">
         </activity>
+        <activity android:name=".ui.chat.ChatActivity">
+        </activity>
     </application>
 
 </manifest>
