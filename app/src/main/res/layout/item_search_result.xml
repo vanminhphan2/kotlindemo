@@ -33,7 +33,7 @@
                android:layout_toLeftOf="@id/ic_online"
                android:layout_marginRight="@dimen/_5sdp"
                android:scaleType="centerCrop"
-               android:src="@drawable/logo_splash"/>
+               android:src="@drawable/icon_message"/>
 
     <View android:layout_width="@dimen/_10sdp"
           android:layout_height="@dimen/_10sdp"
