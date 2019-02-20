@@ -47,16 +47,17 @@ class SearchFragment : BaseFragment<SearchViewModel>() {
     override fun initializeViews() {
 
         val layoutManager= LinearLayoutManager(context)
-//        val user= User("123","rio pro kute so handsome ahihi","111","112")
-//        val array :ArrayList<User> = arrayListOf(user,user,user,user,user,user,user,user,user,user,user,user,user,user)
         listSearchResultAdapter= ListSearchResultAdapter(viewModel.searchViewData.listUser,context)
         fragmentSearchBinding.recyclerListUser.layoutManager=layoutManager
         fragmentSearchBinding.recyclerListUser.adapter=listSearchResultAdapter
         listSearchResultAdapter.setMyCallback(MyCallBack { t->
-            val idUSer:Int= t as Int
-            val starter = Intent(getBaseActivity(), ChatActivity::class.java)
-            starter.putExtra(AppConstants.ID_USER_CHOOSE,idUSer)
-            startActivity(starter)
+
+            val idUSer:String= t as String
+            if(viewModel.checkIsLoginId(idUSer)){
+                val starter = Intent(getBaseActivity(), ChatActivity::class.java)
+                starter.putExtra(AppConstants.ID_USER_CHOOSE,idUSer)
+                startActivity(starter)
+            }
         })
     }
 

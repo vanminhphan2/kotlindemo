@@ -120,7 +120,7 @@ class MainActivity :BaseActivity<MainViewModel>() {
         })
     }
 
-    override fun observeDataChange() {
+    override fun initData() {
     }
 
 }

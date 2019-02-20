@@ -8,9 +8,13 @@ public interface PreferencesHelper {
 
     String getPass();
 
-    void setPass(String token);
+    void setPass(String pass);
 
     String getLoginToken();
 
     void setLoginToken(String token);
+
+    String getUserId();
+
+    void setUserId(String id);
 }

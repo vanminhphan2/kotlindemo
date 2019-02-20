@@ -2,8 +2,8 @@ package com.example.rio.kottlin_demo.ui.register
 
 import android.text.Editable
 import android.util.Log
-import com.example.rio.kottlin_demo.MyApp
 import com.example.rio.kottlin_demo.data.AppDataManager
+import com.example.rio.kottlin_demo.data.firebase.FirebaseReferenceInstance
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
 import com.example.rio.kottlin_demo.utils.AppConstants
@@ -23,9 +23,9 @@ import com.google.firebase.database.ValueEventListener
 class RegisterViewModel @Inject constructor(private var appDataManager: AppDataManager) : BaseViewModel<RegisterViewData>(){
 
     var registerViewData:RegisterViewData
-    val database = FirebaseDatabase.getInstance()
-    val myRef = database.getReference("users")
-    val myRefSession = database.getReference("sessions")
+//    val database = FirebaseDatabase.getInstance()
+//    val myRef = database.getReference("users")
+//    val myRefSession = database.getReference("sessions")
 
     private val onRegisterClick: SingleLiveEvent<Void>
     private val onVerifyCode: SingleLiveEvent<Void>
@@ -65,15 +65,18 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
             registerViewData.message="Pass is incorrect!"
             onShowMessageEvent().call()
         }else{
-            myRef.child(registerViewData.idUser).child("isUpdateInfo").setValue(true)
-            myRef.child(registerViewData.idUser).child("name").setValue(registerViewData.name)
-            myRef.child(registerViewData.idUser).child("pass").setValue(registerViewData.pass)
+//            myRef.child(registerViewData.idUser).child("isUpdateInfo").setValue(true)
+//            myRef.child(registerViewData.idUser).child("name").setValue(registerViewData.name)
+//            myRef.child(registerViewData.idUser).child("pass").setValue(registerViewData.pass)
 //            myRef.child(registerViewData.idUser).child("forceResendingToken").setValue(registerViewData.forceResendingToken)
+            val user=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
             val token=AppConstants.generateTokenString()
-            myRefSession.child(token).setValue(registerViewData.phone)
+//            myRefSession.child(token).setValue(registerViewData.phone)
+            FirebaseReferenceInstance.updateUserAccount(user)
+            FirebaseReferenceInstance.createLoginToken(token,registerViewData.phone)
             appDataManager.setLoginToken(token)
 //            registerViewData.user=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
-            MyApp.myApp.userProfile=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
+//            MyApp.myApp.userProfile=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
             onRegisterSuccessEvent().call()
         }
     }
@@ -161,7 +164,7 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
     }
 
     fun checkExitsPhoneOnServer(){
-        myRef.addValueEventListener(object : ValueEventListener {
+        FirebaseReferenceInstance.getUsersReference().addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.getValue() != null){
 
@@ -186,7 +189,7 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
                     Log.e("Rio", "dataSnapshot.getValue() null")
 
                 }
-                myRef.removeEventListener(this);
+                FirebaseReferenceInstance.getUsersReference().removeEventListener(this);
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -204,8 +207,10 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
         registerViewData.isVisibilityEtPassCode=true
         registerViewData.isVisibilityBtnRegister=true
         updateViewData(registerViewData)
-        myRef.child(registerViewData.idUser).child("phone").setValue(registerViewData.phone)
-        myRef.child(registerViewData.idUser).child("isUpdateInfo").setValue(false)
+//        myRef.child(registerViewData.idUser).child("phone").setValue(registerViewData.phone)
+//        myRef.child(registerViewData.idUser).child("isUpdateInfo").setValue(false)
+        FirebaseReferenceInstance.createUserAccount(registerViewData.idUser,registerViewData.phone)
+        appDataManager.setUserId(registerViewData.idUser)
         hideLoading()
     }
 

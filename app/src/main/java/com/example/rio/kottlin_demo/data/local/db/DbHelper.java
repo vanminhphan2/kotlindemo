@@ -14,5 +14,7 @@ public interface DbHelper {
 
     Observable<User> findUserByPhone(String phone);
 
+    Observable<User> getInfoUserLogin(String id);
+
     Observable<User> loginByPhone(String phone,String pass);
 }

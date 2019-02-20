@@ -45,7 +45,7 @@ class SplashActivity : BaseActivity<SplashViewModel>() {
         })
     }
 
-    override fun observeDataChange() {
+    override fun initData() {
 
     }
 

@@ -1,5 +1,6 @@
 package com.example.rio.kottlin_demo.utils
 
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.UUID.randomUUID
 
@@ -38,5 +39,11 @@ object AppConstants {
     fun generateTokenString(): String {
         val uuid = UUID.randomUUID().toString()
         return uuid
+    }
+
+    fun getTimeNow():String{
+           var formatter =  SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        var date = Date();
+        return formatter.format(date)
     }
 }// This utility class is not publicly instantiable

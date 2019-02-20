@@ -7,5 +7,9 @@ import java.io.Serializable
 
 
 @Entity(tableName = "Boxs")
-class Box(@PrimaryKey val id:String, @ColumnInfo val name:String, @ColumnInfo val idSentUser:String, @ColumnInfo val idReceiveUser:String ,@ColumnInfo val content:String ):
+data class Box(@PrimaryKey var id:String="",
+               @ColumnInfo var name:String="",
+               @ColumnInfo var members: ArrayList<String> = arrayListOf(),
+               @ColumnInfo var type:String="",
+               @ColumnInfo var content:String="" ):
     Serializable

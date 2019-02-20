@@ -7,16 +7,22 @@ import com.example.rio.kottlin_demo.data.firebase.FirebaseReferenceInstance
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
 import com.example.rio.kottlin_demo.utils.AppConstants
+import com.example.rio.kottlin_demo.utils.ConvertData
 import com.example.rio.kottlin_demo.utils.SingleLiveEvent
+import com.example.rio.kottlin_demo.utils.rx.AppSchedulerProvider
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
+import java.net.UnknownHostException
 import javax.inject.Inject
 
-class LoginViewModel @Inject constructor(private var appDataManager: AppDataManager):BaseViewModel<LoginViewData>(){
+class LoginViewModel @Inject constructor(private var appDataManager: AppDataManager) : BaseViewModel<LoginViewData>() {
 
-    var loginViewData:LoginViewData
+    var loginViewData: LoginViewData
     private val toRegister: SingleLiveEvent<Void>
     private val toMain: SingleLiveEvent<Void>
 
@@ -29,79 +35,87 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
     }
 
     init {
-        loginViewData= LoginViewData()
+        loginViewData = LoginViewData()
         setDataView()
 
-        toRegister= SingleLiveEvent()
-        toMain= SingleLiveEvent()
+        toRegister = SingleLiveEvent()
+        toMain = SingleLiveEvent()
     }
 
-    fun setDataView(){
+    fun setDataView() {
         viewData.setValue(loginViewData)
     }
 
-    fun onServerLoginClick(){
-        if(loginViewData.phone.length<10)
-        {
-            loginViewData.message="Name is incorrect!"
+    fun onServerLoginClick() {
+        if (loginViewData.phone.length < 10) {
+            loginViewData.message = "Name is incorrect!"
             onShowMessageEvent().call()
-        }else if(loginViewData.pass.length<6){
-            loginViewData.message="Pass is incorrect!"
+        } else if (loginViewData.pass.length < 6) {
+            loginViewData.message = "Pass is incorrect!"
             onShowMessageEvent().call()
-        }else{
+        } else {
             onLoginServer()
         }
     }
 
-    fun onRegisterClick(){
+    fun onRegisterClick() {
         getToRegisterEvent().call()
     }
 
     fun updatePhone(phone: Editable) {
-        loginViewData.phone=phone.toString()
+        loginViewData.phone = phone.toString()
     }
 
     fun updatePass(pass: Editable) {
-        loginViewData.pass=pass.toString()
+        loginViewData.pass = pass.toString()
     }
 
-    fun onLoginServer(){
+    fun onLoginServer() {
         FirebaseReferenceInstance.getUsersReference().addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.getValue() != null){
+                if (dataSnapshot.getValue() != null) {
 
-                    var phoneIsSuccess=false
-                    var passIsSuccess=false
-                    for ( postSnapshot in dataSnapshot.getChildren()) {
-                        if(loginViewData.phone.equals(postSnapshot.child("phone").value)){
-                            phoneIsSuccess=true
-                            if(loginViewData.pass.equals(postSnapshot.child("pass").value)){
-                                passIsSuccess=true
-                                loginViewData.name= postSnapshot.child("name").value.toString()
-                                loginViewData.name= postSnapshot.key.toString()
+                    var phoneIsSuccess = false
+                    var passIsSuccess = false
+                    var u: User? = null
+                    for (snapshot in dataSnapshot.getChildren()) {
+                        if (loginViewData.phone.equals(snapshot.child("phone").value)) {
+                            phoneIsSuccess = true
+                            if (loginViewData.pass.equals(snapshot.child("pass").value)) {
+                                passIsSuccess = true
+                                u = ConvertData.convertSnapshotToUser(snapshot)
                             }
                         }
                     }
-                    if(phoneIsSuccess&&passIsSuccess){
-
-                        val token= AppConstants.generateTokenString()
+                    if (phoneIsSuccess && passIsSuccess && u != null) {
+                        val token = AppConstants.generateTokenString()
                         FirebaseReferenceInstance.getSessionsReference().child(token).setValue(loginViewData.phone)
                         appDataManager.setLoginToken(token)
-                        getToMainEvent().call()
-                        Log.e("Rio", "login is ok")
-                    }
-                    else{
-                        if(!phoneIsSuccess){
-                            loginViewData.message="Phone is incorrect!"
+                        appDataManager.setUserId(u.id)
+                        disposable.add(appDataManager.insertUser(u)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({ t: User? ->
+                                Log.e("Rio", "login is ok")
+                                Log.e("Rio", "save user success : " + t.toString())
+                                getToMainEvent().call()
+                            }, { throwable ->
+                                Log.e("Rio", "save user fails")
+                            })
+                        )
+
+                    } else {
+                        if (!phoneIsSuccess) {
+                            loginViewData.message = "Phone is incorrect!"
                             Log.e("Rio", "login phone is incorrect!")
-                        }else{
-                            loginViewData.message="Pass is incorrect!"
+                        } else {
+                            loginViewData.message = "Pass is incorrect!"
                             Log.e("Rio", "login pass is incorrect!")
                         }
                         hideLoading()
                         onShowMessageEvent().call()
                     }
-                }else{
+                } else {
                     Log.e("Rio", "dataSnapshot.getValue() null")
                 }
                 FirebaseReferenceInstance.getUsersReference().removeEventListener(this);
@@ -109,7 +123,7 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
 
             override fun onCancelled(error: DatabaseError) {
                 // Failed to read value
-                Log.e("Rio", "Failed to read value."+ error.message)
+                Log.e("Rio", "Failed to read value." + error.message)
             }
         })
 

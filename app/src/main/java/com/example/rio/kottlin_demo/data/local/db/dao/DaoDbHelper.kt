@@ -12,6 +12,10 @@ import javax.inject.Singleton
 @Singleton
 class DaoDbHelper @Inject constructor(private val daoDatabase: DaoDatabase) :DbHelper {
 
+    override fun getInfoUserLogin(id: String?): Observable<User> {
+        return Observable.fromCallable { daoDatabase.userDao().findUserById(id) }
+    }
+
     override fun getAllUsers(): Observable<List<User>> {
         return Observable.fromCallable<List<User>> { daoDatabase.userDao().loadAll() }
     }

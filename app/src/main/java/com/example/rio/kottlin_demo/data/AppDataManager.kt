@@ -14,7 +14,6 @@ class AppDataManager @Inject constructor(
     private val mDbHelper: DbHelper
 ) :DataManager {
 
-
     override fun getAllUsers(): Observable<MutableList<User>> {
         return mDbHelper.getAllUsers()
     }
@@ -25,6 +24,10 @@ class AppDataManager @Inject constructor(
 
     override fun findUserByPhone(phone: String?): Observable<User> {
         return mDbHelper.findUserByPhone(phone)
+    }
+
+    override fun getInfoUserLogin(id: String?): Observable<User> {
+        return mDbHelper.getInfoUserLogin(id)
     }
 
     override fun getPhone(): String? {
@@ -54,4 +57,13 @@ class AppDataManager @Inject constructor(
     override fun setLoginToken(token: String?) {
         mPreferencesHelper.setLoginToken(token)
     }
+
+    override fun getUserId(): String {
+        return mPreferencesHelper.getUserId()
+    }
+
+    override fun setUserId(id: String?) {
+        mPreferencesHelper.setUserId(id)
+    }
+
 }

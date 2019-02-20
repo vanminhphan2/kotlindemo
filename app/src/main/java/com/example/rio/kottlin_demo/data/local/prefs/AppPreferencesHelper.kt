@@ -13,6 +13,8 @@ class AppPreferencesHelper @Inject constructor(context: Context, @PreferenceInfo
 
     private val PREF_KEY_TOKEN = "PREF_KEY_TOKEN"
 
+    private val PREF_KEY_USER_ID = "PREF_KEY_USER_ID"
+
     private val mPrefs: SharedPreferences
 
     init {
@@ -41,5 +43,13 @@ class AppPreferencesHelper @Inject constructor(context: Context, @PreferenceInfo
 
     override fun setLoginToken(token: String?) {
         mPrefs.edit().putString(PREF_KEY_TOKEN, token).apply()
+    }
+
+    override fun getUserId(): String? {
+        return mPrefs.getString(PREF_KEY_USER_ID, null)
+    }
+
+    override fun setUserId(id: String?) {
+        mPrefs.edit().putString(PREF_KEY_USER_ID, id).apply()
     }
 }

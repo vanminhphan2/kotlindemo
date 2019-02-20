@@ -68,7 +68,7 @@ class LoginActivity : BaseActivity<LoginViewModel>() {
 
     }
 
-    override fun observeDataChange() {
+    override fun initData() {
 
     }
 

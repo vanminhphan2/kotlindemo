@@ -51,7 +51,7 @@ abstract class BaseActivity<V : Any> : AppCompatActivity(), HasSupportFragmentIn
 
     protected abstract fun registerEvents()
 
-    protected abstract fun observeDataChange()
+    protected abstract fun initData()
 
     fun showLoading() {
         if (loadingDialog != null)

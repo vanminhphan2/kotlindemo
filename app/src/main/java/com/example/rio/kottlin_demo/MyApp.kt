@@ -11,14 +11,6 @@ import javax.inject.Inject
 
 class MyApp : MultiDexApplication(),HasActivityInjector {
 
-//    val myApp:MyApp
-
-    companion object {
-        lateinit var myApp: MyApp
-            private set
-    }
-    var userProfile:User?=null
-
     @Inject
     lateinit var activityDispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
 
@@ -30,6 +22,5 @@ class MyApp : MultiDexApplication(),HasActivityInjector {
         super.onCreate()
 
         DaggerAppComponent.builder().application(this).build().inject(this)
-        myApp = this
     }
 }

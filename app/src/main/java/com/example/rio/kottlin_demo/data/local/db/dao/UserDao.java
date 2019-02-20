@@ -29,6 +29,9 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE phone IN (:phone)")
     User findUserByPhone(String phone);
 
+    @Query("SELECT * FROM users WHERE id IN (:id)")
+    User findUserById(String id);
+
     @Query("SELECT * FROM users WHERE phone IN (:phone) AND pass In (:pass)")
     User loginByPhone(String phone,String pass);
 

@@ -39,7 +39,7 @@ class BoxsFragment : BaseFragment<BoxsViewModel>() {
     override fun initializeViews() {
 
         val layoutManager= LinearLayoutManager(context)
-        val box=Box("123","hop box so 1","111","112","ahihaihi")
+        val box=Box()
         val array :ArrayList<Box> = arrayListOf(box,box,box,box,box,box,box,box,box,box,box,box)
         listBoxAdapter= ListBoxAdapter(array,context)
         fragmentBoxsBinding.recyclerBoxs.layoutManager=layoutManager
