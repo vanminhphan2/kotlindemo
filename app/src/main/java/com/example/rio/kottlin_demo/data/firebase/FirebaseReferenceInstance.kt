@@ -59,23 +59,24 @@ object FirebaseReferenceInstance {
         getSessionsReference().child(token).setValue(phone)
     }
 
-    fun createSingleBox(key:String, userLogin:User,userReceive:User){
+    fun createSingleBox( userLogin:User,userReceive:User){
 
         val listId= listOf(userLogin.id,userReceive.id)
+        val idBox1=FirebaseReferenceInstance.getBoxsReference().push().key.toString()
+        val idBox2=FirebaseReferenceInstance.getBoxsReference().push().key.toString()
 
-        getBoxsReference().child(userLogin.id).child(key).child("name").setValue(userReceive.name)
-        getBoxsReference().child(userLogin.id).child(key).child("type").setValue("single")
-        getBoxsReference().child(userLogin.id).child(key).child("members").setValue(listId)
-        getBoxsReference().child(userLogin.id).child(key).child("isBlock").setValue(false)
+        getBoxsReference().child(userLogin.id).child(idBox1).child("name").setValue(userReceive.name)
+        getBoxsReference().child(userLogin.id).child(idBox1).child("type").setValue("single")
+        getBoxsReference().child(userLogin.id).child(idBox1).child("members").setValue(listId)
+        getBoxsReference().child(userLogin.id).child(idBox1).child("isBlock").setValue(false)
 
-        getBoxsReference().child(userReceive.id).child(key).child("name").setValue(userLogin.name)
-        getBoxsReference().child(userReceive.id).child(key).child("type").setValue("single")
-        getBoxsReference().child(userReceive.id).child(key).child("members").setValue(listId)
-        getBoxsReference().child(userReceive.id).child(key).child("isBlock").setValue(false)
+        getBoxsReference().child(userReceive.id).child(idBox2).child("name").setValue(userLogin.name)
+        getBoxsReference().child(userReceive.id).child(idBox2).child("type").setValue("single")
+        getBoxsReference().child(userReceive.id).child(idBox2).child("members").setValue(listId)
+        getBoxsReference().child(userReceive.id).child(idBox2).child("isBlock").setValue(false)
     }
 
     fun createMessage(idBox:String,mess:Message){
-        mess.id=FirebaseReferenceInstance.getMessagesReference().push().key.toString()
         getMessagesReference().child(idBox).child(mess.id).setValue(mess)
     }
 

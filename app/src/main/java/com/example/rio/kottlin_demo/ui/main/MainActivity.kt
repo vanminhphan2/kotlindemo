@@ -79,6 +79,7 @@ class MainActivity :BaseActivity<MainViewModel>() {
         listFragment.add(boxsFragment)
         listFragment.add(accountFragment)
         activityMainBinding.viewpager.setAdapter(viewPagerAdapter)
+        activityMainBinding.viewpager.offscreenPageLimit=2
         activityMainBinding.viewpager.setCurrentItem(1);
         activityMainBinding.navigation.getMenu().getItem(1).setChecked(true)
         activityMainBinding.viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {

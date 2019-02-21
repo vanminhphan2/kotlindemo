@@ -99,7 +99,8 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
                         }
 
                     }
-                    FirebaseReferenceInstance.removeEventGetBoxByIdUser(chatViewData.user.id,
+                    FirebaseReferenceInstance.removeEventGetBoxByIdUser(
+                        chatViewData.user.id,
                         this
                     )
                 }
@@ -180,20 +181,13 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
                                     createNewBox()
                                     sendMessToServer()
                                     onClickSendEvent().call()
-                                    FirebaseReferenceInstance.removeListener(
-                                        FirebaseReferenceInstance.getBoxsReference(),
-                                        this
-                                    )
+                                    FirebaseReferenceInstance.removeEventGetBoxByIdUser(chatViewData.user.id, this)
                                 }
-
                             } else {
                                 createNewBox()
                                 sendMessToServer()
                                 onClickSendEvent().call()
-                                FirebaseReferenceInstance.removeListener(
-                                    FirebaseReferenceInstance.getBoxsReference(),
-                                    this
-                                )
+                                FirebaseReferenceInstance.removeEventGetBoxByIdUser(chatViewData.user.id, this)
                             }
 
                         }
@@ -208,6 +202,20 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
         chatViewData.contentMess = value.toString()
     }
 
+    fun createNewBox() {
+        Log.e("Rio ", "boxs null:-->create new box  ")
+//        chatViewData.mainBox.id = FirebaseReferenceInstance.getBoxsReference().push().key.toString()
+
+        chatViewData.mainBox.members = arrayListOf(chatViewData.user.id, chatViewData.userReceive.id)
+
+        FirebaseReferenceInstance.createSingleBox(
+//            chatViewData.mainBox.id,
+            chatViewData.user,
+            chatViewData.userReceive
+        )
+        chatViewData.isHadBox = true
+    }
+
     fun sendMessToServer() {
         val mess = Message()
         mess.contentMess = chatViewData.contentMess
@@ -217,23 +225,10 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
         mess.type = "text"
         chatViewData.listChat.add(mess)
         onAddMessEvent().call()
+        mess.id=FirebaseReferenceInstance.getMessagesReference().push().key.toString()
         for (id in 0 until chatViewData.mainBox.members.size) {
             FirebaseReferenceInstance.createMessage(chatViewData.mainBox.members[id], mess)
         }
-    }
-
-    fun createNewBox() {
-        Log.e("Rio ", "boxs null:-->create new box  ")
-        chatViewData.mainBox.id = FirebaseReferenceInstance.getBoxsReference().push().key.toString()
-
-        chatViewData.mainBox.members = arrayListOf(chatViewData.user.id, chatViewData.userReceive.id)
-
-        FirebaseReferenceInstance.createSingleBox(
-            chatViewData.mainBox.id,
-            chatViewData.user,
-            chatViewData.userReceive
-        )
-        chatViewData.isHadBox = true
     }
 
     fun getIdUserLogin() {
