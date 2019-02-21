@@ -1,6 +1,7 @@
 package com.example.rio.kottlin_demo.ui.main.boxs
 
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -13,7 +14,6 @@ import com.example.rio.kottlin_demo.data.model.Box
 import com.example.rio.kottlin_demo.databinding.FragmentBoxsBinding
 import com.example.rio.kottlin_demo.ui.adapter.ListBoxAdapter
 import com.example.rio.kottlin_demo.ui.base.BaseFragment
-import java.util.*
 
 class BoxsFragment : BaseFragment<BoxsViewModel>() {
 
@@ -28,6 +28,8 @@ class BoxsFragment : BaseFragment<BoxsViewModel>() {
         fragmentBoxsBinding = FragmentBoxsBinding.inflate(inflater, container, false)
         getViewReferences()
         initializeViews()
+        registerEvents()
+        observeDataChange()
         return fragmentBoxsBinding.getRoot()
     }
 
@@ -39,18 +41,29 @@ class BoxsFragment : BaseFragment<BoxsViewModel>() {
     override fun initializeViews() {
 
         val layoutManager= LinearLayoutManager(context)
-        val box=Box()
-        val array :ArrayList<Box> = arrayListOf(box,box,box,box,box,box,box,box,box,box,box,box)
-        listBoxAdapter= ListBoxAdapter(array,context)
+        listBoxAdapter= ListBoxAdapter(viewModel.boxsViewData.listBox,context)
         fragmentBoxsBinding.recyclerBoxs.layoutManager=layoutManager
         fragmentBoxsBinding.recyclerBoxs.adapter=listBoxAdapter
     }
 
     override fun registerEvents() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        viewModel.getViewData().observe(this, Observer {
+            fragmentBoxsBinding.viewModel = viewModel
+        })
+
+        viewModel.getUpdateListBoxEvent().observe(this, Observer {
+            listBoxAdapter.setListData(viewModel.boxsViewData.listBox)
+        })
+
+        viewModel.getListBoxSuccessEvent().observe(this, Observer {
+            listBoxAdapter.setListData(viewModel.boxsViewData.listBox)
+        })
     }
 
     override fun observeDataChange() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        viewModel.getUserLogin()
+//        viewModel.getListBox()
     }
 }

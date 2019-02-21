@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import com.example.rio.kottlin_demo.R
+import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.databinding.ActivityChatBinding
 import com.example.rio.kottlin_demo.ui.adapter.ListChatAdapter
 import com.example.rio.kottlin_demo.ui.base.BaseActivity
@@ -13,12 +14,12 @@ import com.example.rio.kottlin_demo.utils.AppConstants
 
 class ChatActivity : BaseActivity<ChatViewModel>() {
 
-    private lateinit var activityChatBinding:ActivityChatBinding
-    private lateinit var listChatAdapter:ListChatAdapter
+    private lateinit var activityChatBinding: ActivityChatBinding
+    private lateinit var listChatAdapter: ListChatAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getViewReferences()
-        if(intent.getStringExtra(AppConstants.ID_USER_CHOOSE) != ""){
+        if (intent.getStringExtra(AppConstants.USER_CHOOSE) != "") {
             registerEvents()
             initializeViews()
             initData()
@@ -33,10 +34,12 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
 
     override fun initializeViews() {
 
-        val layoutManager= LinearLayoutManager(applicationContext)
-        listChatAdapter= ListChatAdapter(viewModel.chatViewData.listChat,applicationContext,viewModel.chatViewData.idUserLogin)
-        activityChatBinding.rvListContentChat.layoutManager=layoutManager
-        activityChatBinding.rvListContentChat.adapter=listChatAdapter
+        viewModel.getIdUserLogin()
+        val layoutManager = LinearLayoutManager(applicationContext)
+        listChatAdapter = ListChatAdapter(viewModel.chatViewData.listChat, applicationContext)
+        activityChatBinding.rvListContentChat.layoutManager = layoutManager
+        activityChatBinding.rvListContentChat.adapter = listChatAdapter
+
 
     }
 
@@ -48,14 +51,14 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
 
 
 
-        viewModel.onLoadingEvent().observe(this, Observer {t->
+        viewModel.onLoadingEvent().observe(this, Observer { t ->
             if (t!!)
                 showLoading()
             else hideLoading()
         })
 
         viewModel.onShowMessageEvent().observe(this, Observer {
-//            Toast.makeText(this, viewModel..message, Toast.LENGTH_SHORT).show()
+            //            Toast.makeText(this, viewModel..message, Toast.LENGTH_SHORT).show()
         })
 
         viewModel.onClickBackEvent().observe(this, Observer {
@@ -66,10 +69,19 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
             activityChatBinding.etContent.setText("")
         })
 
+        viewModel.onGetListChatSuccessEvent().observe(this, Observer {
+            listChatAdapter.setListDataMess(viewModel.chatViewData.listChat, viewModel.chatViewData.user.id)
+        })
+
+        viewModel.onAddMessEvent().observe(this, Observer {
+            listChatAdapter.notifyItemChanged(viewModel.chatViewData.listChat.size - 1)
+        })
     }
 
     override fun initData() {
-        viewModel.chatViewData.idUserReceive=intent.getStringExtra(AppConstants.ID_USER_CHOOSE)
+        viewModel.chatViewData.userReceive = intent.getSerializableExtra(AppConstants.USER_CHOOSE) as User
+//        viewModel.bindInfoUserReceive()
+        activityChatBinding.tvName.setText(viewModel.chatViewData.userReceive.name)
         viewModel.getBoxDataFromServer()
     }
 

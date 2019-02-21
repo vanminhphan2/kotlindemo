@@ -34,6 +34,7 @@ object AppConstants {
 
     val INFO_USER_KEY = "INFO_USER"
     val ID_USER_CHOOSE = "ID_USER_CHOOSE"
+    val USER_CHOOSE = "USER_CHOOSE"
 
     val REQUEST_CODE_TO_REGISTER_ACTIVITY = 2
     fun generateTokenString(): String {

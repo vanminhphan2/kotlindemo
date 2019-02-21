@@ -11,17 +11,17 @@ import java.io.Serializable
 data class User(
     @PrimaryKey
     @SerializedName("id")
-    @Expose val id: String,
+    @Expose var id: String="",
 
     @ColumnInfo
     @SerializedName("name")
-    @Expose val name: String,
+    @Expose var name: String="",
 
     @ColumnInfo
     @SerializedName("phone")
-    @Expose val phone: String,
+    @Expose var phone: String="",
 
     @ColumnInfo
     @SerializedName("pass")
-    @Expose val pass: String
+    @Expose var pass: String=""
 ) : Serializable

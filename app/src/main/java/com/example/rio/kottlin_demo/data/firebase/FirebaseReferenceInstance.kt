@@ -41,10 +41,6 @@ object FirebaseReferenceInstance {
         return getDatabase().child("messages")
     }
 
-    fun removeListener(databaseReference : DatabaseReference,listener: ValueEventListener){
-        databaseReference.removeEventListener(listener)
-    }
-
     fun createUserAccount(idUser:String,phone:String){
 
         getUsersReference().child(idUser).child("phone").setValue(phone)
@@ -63,11 +59,19 @@ object FirebaseReferenceInstance {
         getSessionsReference().child(token).setValue(phone)
     }
 
-    fun createSingleBox(key:String, idUser1:String,idUser2:String){
-        val listId= listOf(idUser1,idUser2)
-        getBoxsReference().child(key).child("name").setValue("single chat")
-        getBoxsReference().child(key).child("type").setValue("single")
-        getBoxsReference().child(key).child("members").setValue(listId)
+    fun createSingleBox(key:String, userLogin:User,userReceive:User){
+
+        val listId= listOf(userLogin.id,userReceive.id)
+
+        getBoxsReference().child(userLogin.id).child(key).child("name").setValue(userReceive.name)
+        getBoxsReference().child(userLogin.id).child(key).child("type").setValue("single")
+        getBoxsReference().child(userLogin.id).child(key).child("members").setValue(listId)
+        getBoxsReference().child(userLogin.id).child(key).child("isBlock").setValue(false)
+
+        getBoxsReference().child(userReceive.id).child(key).child("name").setValue(userLogin.name)
+        getBoxsReference().child(userReceive.id).child(key).child("type").setValue("single")
+        getBoxsReference().child(userReceive.id).child(key).child("members").setValue(listId)
+        getBoxsReference().child(userReceive.id).child(key).child("isBlock").setValue(false)
     }
 
     fun createMessage(idBox:String,mess:Message){
@@ -99,8 +103,25 @@ object FirebaseReferenceInstance {
     }
 
 
-    fun getBoxBy2IdUser(): Query {
-        return getBoxsReference().orderByChild("type").equalTo("single")
+    fun getBoxByIdUser(idUser:String): Query {
+        return getBoxsReference().child(idUser)
+    }
+
+    fun getListMessageByIdBox(idBox:String): Query {
+        return getMessagesReference().child(idBox)
+    }
+
+    fun getListIdBoxByUserId(idUser: String): Query {
+        return getBoxsReference().child(idUser)
+    }
+
+    fun removeListener(databaseReference : DatabaseReference,listener: ValueEventListener){
+        databaseReference.removeEventListener(listener)
+    }
+
+
+    fun removeEventGetBoxByIdUser(idUser:String,listener: ValueEventListener) {
+        getBoxsReference().child(idUser).removeEventListener(listener)
     }
 
 }

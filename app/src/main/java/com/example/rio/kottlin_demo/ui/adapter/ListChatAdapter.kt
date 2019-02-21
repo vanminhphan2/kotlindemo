@@ -15,11 +15,18 @@ import com.example.rio.kottlin_demo.R
 import com.example.rio.kottlin_demo.data.model.Message
 import java.util.ArrayList
 
-class ListChatAdapter(private val listData: ArrayList<Message>, var context: Context?,var idUserLogin:String) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ListChatAdapter(private var listData: ArrayList<Message>, var context: Context?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val VIEW_TYPE_EMPTY = 0
     val VIEW_TYPE_RECEIVE = 1
     val VIEW_TYPE_SEND= 2
+    private var idUserLogin:String=""
+
+    fun setListDataMess(list: ArrayList<Message>,idUserLogin:String){
+        this.listData=list
+        this.idUserLogin=idUserLogin
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): RecyclerView.ViewHolder {
         when (p1) {
@@ -61,11 +68,9 @@ class ListChatAdapter(private val listData: ArrayList<Message>, var context: Con
         if (!listData.isEmpty()) {
             if(listData.get(position).idUser.equals(idUserLogin)){
 
-                Log.e("Rio ", "getItemViewType 123 123  : "+idUserLogin)
                 return VIEW_TYPE_SEND
             }
             else{
-                Log.e("Rio ", "getItemViewType 123 111  : "+idUserLogin)
                 return VIEW_TYPE_RECEIVE
             }
 

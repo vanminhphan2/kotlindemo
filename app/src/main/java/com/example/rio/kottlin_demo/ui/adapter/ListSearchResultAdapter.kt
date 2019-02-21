@@ -82,7 +82,7 @@ class ListSearchResultAdapter (private var listData: ArrayList<User>, var contex
                 .apply(RequestOptions.circleCropTransform())
                 .into(p0.imgAva)
             p0.itemLayout.setOnClickListener {
-                myCallBack!!.onItemClick(listData.get(p1).id)
+                myCallBack!!.onItemClick(listData.get(p1))
             }
         } else if (p0 is LoadMoreViewHolder) {
 

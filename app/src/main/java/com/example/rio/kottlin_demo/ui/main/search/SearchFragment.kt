@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.databinding.FragmentSearchBinding
@@ -52,11 +53,14 @@ class SearchFragment : BaseFragment<SearchViewModel>() {
         fragmentSearchBinding.recyclerListUser.adapter=listSearchResultAdapter
         listSearchResultAdapter.setMyCallback(MyCallBack { t->
 
-            val idUSer:String= t as String
-            if(viewModel.checkIsLoginId(idUSer)){
+            val user:User= t as User
+            if(viewModel.checkIsLoginId(user.id)){
                 val starter = Intent(getBaseActivity(), ChatActivity::class.java)
-                starter.putExtra(AppConstants.ID_USER_CHOOSE,idUSer)
+                starter.putExtra(AppConstants.USER_CHOOSE,user)
                 startActivity(starter)
+            }
+            else{
+                Toast.makeText(context,"It's you!",Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -68,7 +72,6 @@ class SearchFragment : BaseFragment<SearchViewModel>() {
         })
 
         viewModel.getUpdateListUserEvent().observe(this, Observer {
-//            Log.e("Rio ","getUpdateListUserEvent = "+viewModel.searchViewData.listUser.toString())
             listSearchResultAdapter.setListData(viewModel.searchViewData.listUser)
         })
 

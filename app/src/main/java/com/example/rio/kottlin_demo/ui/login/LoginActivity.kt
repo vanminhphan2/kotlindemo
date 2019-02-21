@@ -77,11 +77,7 @@ class LoginActivity : BaseActivity<LoginViewModel>() {
 
         if (requestCode == AppConstants.REQUEST_CODE_TO_REGISTER_ACTIVITY) {
             if (resultCode == Activity.RESULT_OK) {
-//                val result = data!!.getStringExtra(AppConstants.INFO_USER_KEY)
-
                 val intent= Intent(this@LoginActivity, MainActivity::class.java)
-
-//                intent.putExtra(AppConstants.INFO_USER_KEY,result)
                 startActivity(intent)
             }
         }

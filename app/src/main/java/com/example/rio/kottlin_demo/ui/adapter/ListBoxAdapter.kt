@@ -15,11 +15,15 @@ import com.example.rio.kottlin_demo.R
 import com.example.rio.kottlin_demo.data.model.Box
 import java.util.ArrayList
 
-class ListBoxAdapter(private val listBox: ArrayList<Box>, var context: Context?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ListBoxAdapter(private var listBox: ArrayList<Box>, var context: Context?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val VIEW_TYPE_EMPTY = 0
     val VIEW_TYPE_NORMAL = 1
 
+    fun setListData(list:ArrayList<Box>){
+        this.listBox=list
+        notifyDataSetChanged()
+    }
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): RecyclerView.ViewHolder {
         when (p1) {
             VIEW_TYPE_NORMAL -> return NormalViewHolder(
