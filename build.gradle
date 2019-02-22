@@ -11,6 +11,7 @@ buildscript {
     ext.firebase_version = '16.0.6'
     ext.firebase_auth_version = '16.1.0'
     ext.firebase_service_version = '16.0.1'
+    ext.firebase_firestore = '18.0.1'
     repositories {
         google()
         jcenter()

@@ -5,7 +5,9 @@ import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import com.example.rio.kottlin_demo.R
+import com.example.rio.kottlin_demo.data.model.Box
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.databinding.ActivityChatBinding
 import com.example.rio.kottlin_demo.ui.adapter.ListChatAdapter
@@ -19,11 +21,9 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getViewReferences()
-        if (intent.getStringExtra(AppConstants.USER_CHOOSE) != "") {
             registerEvents()
             initializeViews()
             initData()
-        }
     }
 
     override fun getViewReferences() {
@@ -36,7 +36,7 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
 
         viewModel.getIdUserLogin()
         val layoutManager = LinearLayoutManager(applicationContext)
-        listChatAdapter = ListChatAdapter(viewModel.chatViewData.listChat, applicationContext)
+        listChatAdapter = ListChatAdapter(viewModel.chatViewData.mainBox.listMessage, applicationContext)
         activityChatBinding.rvListContentChat.layoutManager = layoutManager
         activityChatBinding.rvListContentChat.adapter = listChatAdapter
 
@@ -70,19 +70,26 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
         })
 
         viewModel.onGetListChatSuccessEvent().observe(this, Observer {
-            listChatAdapter.setListDataMess(viewModel.chatViewData.listChat, viewModel.chatViewData.user.id)
+            listChatAdapter.setListDataMess(viewModel.chatViewData.mainBox.listMessage, viewModel.chatViewData.user.id)
         })
 
         viewModel.onAddMessEvent().observe(this, Observer {
-            listChatAdapter.notifyItemChanged(viewModel.chatViewData.listChat.size - 1)
+
+            activityChatBinding.rvListContentChat.scrollToPosition(viewModel.chatViewData.mainBox.listMessage.size-1);
         })
     }
 
     override fun initData() {
-        viewModel.chatViewData.userReceive = intent.getSerializableExtra(AppConstants.USER_CHOOSE) as User
-//        viewModel.bindInfoUserReceive()
-        activityChatBinding.tvName.setText(viewModel.chatViewData.userReceive.name)
-        viewModel.getBoxDataFromServer()
+        if (intent.getSerializableExtra(AppConstants.USER_CHOOSE) != null) {
+            viewModel.chatViewData.userReceive = intent.getSerializableExtra(AppConstants.USER_CHOOSE) as User
+            activityChatBinding.tvName.setText(viewModel.chatViewData.userReceive.name)
+            viewModel.getBoxDataFromServer()
+        }else if (intent.getSerializableExtra(AppConstants.BOX_CHOOSE) != null) {
+
+            viewModel.chatViewData.mainBox = intent.getSerializableExtra(AppConstants.BOX_CHOOSE) as Box
+            activityChatBinding.tvName.setText(viewModel.chatViewData.mainBox.name)
+            viewModel.setData()
+        }
     }
 
 }

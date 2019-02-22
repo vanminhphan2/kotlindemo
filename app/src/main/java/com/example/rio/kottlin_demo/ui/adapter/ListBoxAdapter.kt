@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.rio.kottlin_demo.R
 import com.example.rio.kottlin_demo.data.model.Box
+import com.example.rio.kottlin_demo.utils.inf.MyCallBack
 import java.util.ArrayList
 
 class ListBoxAdapter(private var listBox: ArrayList<Box>, var context: Context?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -20,10 +21,22 @@ class ListBoxAdapter(private var listBox: ArrayList<Box>, var context: Context?)
     val VIEW_TYPE_EMPTY = 0
     val VIEW_TYPE_NORMAL = 1
 
+    private var myCallBack: MyCallBack? = null
+
+    fun setMyCallback(myCallBack: MyCallBack){
+        this.myCallBack=myCallBack
+    }
+
+
     fun setListData(list:ArrayList<Box>){
         this.listBox=list
         notifyDataSetChanged()
     }
+
+    fun notifyAddBox(pos:Int){
+        notifyItemChanged(pos)
+    }
+
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): RecyclerView.ViewHolder {
         when (p1) {
             VIEW_TYPE_NORMAL -> return NormalViewHolder(
@@ -74,7 +87,9 @@ class ListBoxAdapter(private var listBox: ArrayList<Box>, var context: Context?)
                 .load(R.drawable.logo_splash)
                 .apply(RequestOptions.circleCropTransform())
                 .into(p0.imgAva)
-//            p0.rlItem.setOnClickListener({ v -> onClickItem.onItemClick(users.get(i)) })
+            p0.itemLayout.setOnClickListener {
+                myCallBack!!.onItemClick(listBox.get(p1))
+            }
         } else if (p0 is LoadMoreViewHolder) {
 
         }

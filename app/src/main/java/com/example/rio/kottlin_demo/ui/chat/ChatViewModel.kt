@@ -4,11 +4,13 @@ import android.text.Editable
 import android.util.Log
 import com.example.rio.kottlin_demo.data.AppDataManager
 import com.example.rio.kottlin_demo.data.firebase.FirebaseReferenceInstance
+import com.example.rio.kottlin_demo.data.model.Box
 import com.example.rio.kottlin_demo.data.model.Message
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
 import com.example.rio.kottlin_demo.utils.AppConstants
 import com.example.rio.kottlin_demo.utils.ConvertData
 import com.example.rio.kottlin_demo.utils.SingleLiveEvent
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -45,10 +47,6 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
         chatViewData = ChatViewData()
     }
 
-    fun bindInfoUserReceive() {
-
-    }
-
     fun getBoxDataFromServer() {
 
         disposable.add(
@@ -66,14 +64,32 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
 
     }
 
+    fun setData(){
+        disposable.add(
+            appDataManager.getInfoUserLogin(chatViewData.user.id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ u ->
+                    Log.e("Rio ", "get info ok ee :   " + chatViewData.mainBox.toString())
+                    chatViewData.user = u
+                    chatViewData.isHadBox = true
+                    chatViewData.userReceive.id=chatViewData.mainBox.id
+                    onGetListChatSuccessEvent().call()
+                    onGetMessListenerEvent()
+                }, { thow ->
+                    Log.e("Rio ", "loi 01204:   " + thow.message)
+                })
+        )
+    }
+
     private fun getDataBox2User() {
 
-        FirebaseReferenceInstance.getBoxByIdUser(chatViewData.user.id)
+        FirebaseReferenceInstance.getBoxBy2IdUser(chatViewData.user.id, chatViewData.userReceive.id)
             .addValueEventListener(object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
                     Log.e("Rio ", "loi get data box: " + p0.message)
                     FirebaseReferenceInstance.removeListener(
-                        FirebaseReferenceInstance.getBoxsReference(),
+                        FirebaseReferenceInstance.getSingleChatBoxsReference(),
                         this
                     )
                 }
@@ -81,50 +97,62 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
                 override fun onDataChange(p0: DataSnapshot) {
 
                     Log.e("Rio ", "boxs 01:  " + p0.toString())
-                    if (p0.getValue() != null) {
+                    if (p0.value != null) {
+                        Log.e("Rio ", "boxs 1122:  " + p0.toString())
+                        chatViewData.isHadBox = true
+                        chatViewData.mainBox  = p0.getValue(Box::class.java)!!
+//                        chatViewData.mainBox  = ConvertData.convertSnapshotToBox(p0.child(chatViewData.userReceive.id))
+                        onGetListChatSuccessEvent().call()
+                        onGetMessListenerEvent()
 
-                        for (p in p0.getChildren()) {
-                            if (p.child("members").value != null) {
-                                val data = ConvertData.convertDataSnapshotToListMember(p.child("members"))
-                                if (data.size == 2 && data.contains(chatViewData.userReceive.id)) {
-                                    chatViewData.isHadBox = true
-                                    chatViewData.mainBox = ConvertData.convertSnapshotToBox(p)
-                                }
-                            }
-                        }
+                        Log.e("Rio ", "boxs 1133:  " + chatViewData.mainBox.toString())
 
-                        if (chatViewData.isHadBox) {
-                            Log.e("Rio ", "da co box--- " + chatViewData.mainBox.toString())
-                            geListMessageDataById()   //get data of box
-                        }
-
+                        FirebaseReferenceInstance.removeEventGetBoxBy2IdUser(
+                            chatViewData.user.id, chatViewData.userReceive.id,
+                            this
+                        )
                     }
-                    FirebaseReferenceInstance.removeEventGetBoxByIdUser(
-                        chatViewData.user.id,
-                        this
-                    )
                 }
-
             })
     }
 
-    private fun geListMessageDataById() {
-        FirebaseReferenceInstance.getListMessageByIdBox(chatViewData.mainBox.id)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    Log.e("Rio ", "loi 01211:   " + p0.message)
+    private fun onGetMessListenerEvent() {
+                    Log.e("Rio ", "id 1 --> "+chatViewData.user.id+"    ---id2  ---> "+ chatViewData.userReceive.id)
+        FirebaseReferenceInstance.getMessListener(chatViewData.user.id, chatViewData.userReceive.id)
+            .addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
 
-                    FirebaseReferenceInstance.removeListener(
-                        FirebaseReferenceInstance.getMessagesReference().child(chatViewData.mainBox.id),
-                        this
-                    )
+//                    Log.e("Rio ", "onChildAdded: ${dataSnapshot.key}")
+                    val mess = dataSnapshot.getValue(Message::class.java)
+                    if (mess != null) {
+                        chatViewData.mainBox.listMessage.add(mess)
+                        onAddMessEvent().call()
+                    }
                 }
 
-                override fun onDataChange(p0: DataSnapshot) {
-                    Log.e("Rio ", "get list mess success:   " + p0.toString())
-                    chatViewData.listChat = ConvertData.convertDataSnapshotToListMessage(p0)
-                    onGetListChatSuccessEvent().call()
+                override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
+//                    Log.e("Rio ", "onChildChanged: ${dataSnapshot.key}")
 
+                    val mess = dataSnapshot.getValue(Message::class.java)
+                    val commentKey = dataSnapshot.key
+
+                }
+
+                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+//                    Log.e("Rio ", "onChildRemoved: ${dataSnapshot.key}")
+                    val commentKey = dataSnapshot.key
+                }
+
+                override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
+//                    Log.e("Rio ", "onChildMoved: ${dataSnapshot.key}")
+
+                    val mess = dataSnapshot.getValue(Message::class.java)
+                    val commentKey = dataSnapshot.key
+
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e("Rio ", "onGetMessListenerEvent:onCancelled", databaseError.toException())
                 }
             })
     }
@@ -137,63 +165,8 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
         if (!chatViewData.contentMess.isEmpty()) {
             if (chatViewData.isHadBox) {
                 sendMessToServer()
-                onClickSendEvent().call()
             } else {
-
-                FirebaseReferenceInstance.getBoxByIdUser(chatViewData.user.id)
-                    .addValueEventListener(object : ValueEventListener {
-                        override fun onCancelled(p0: DatabaseError) {
-                            Log.e("Rio ", "loi get data box: " + p0.message)
-                            FirebaseReferenceInstance.removeListener(
-                                FirebaseReferenceInstance.getBoxsReference(),
-                                this
-                            )
-                        }
-
-                        override fun onDataChange(p0: DataSnapshot) {
-
-                            Log.e("Rio ", "boxs111:  " + p0.toString())
-                            if (p0.getValue() != null) {
-
-                                Log.e("Rio ", "boxs222:  " + p0.getValue().toString())
-                                for (p in p0.getChildren()) {
-
-                                    Log.e("Rio ", "p0 to string:  " + p.toString())
-                                    val data = ConvertData.convertDataSnapshotToListMember(p.child("members"))
-                                    if (data.size == 2 && data.contains(chatViewData.user.id) && data.contains(
-                                            chatViewData.userReceive.id
-                                        )
-                                    ) {
-                                        Log.e("Rio ", "p0 to hereeeee:  " + p.toString())
-                                        chatViewData.isHadBox = true
-                                        chatViewData.mainBox = ConvertData.convertSnapshotToBox(p)
-                                    }
-
-                                }
-
-                                if (chatViewData.isHadBox) {
-                                    Log.e("Rio ", "da co box--- " + chatViewData.mainBox.toString())
-                                    geListMessageDataById()
-
-                                    sendMessToServer()
-                                    onClickSendEvent().call()
-                                } else {
-                                    createNewBox()
-                                    sendMessToServer()
-                                    onClickSendEvent().call()
-                                    FirebaseReferenceInstance.removeEventGetBoxByIdUser(chatViewData.user.id, this)
-                                }
-                            } else {
-                                createNewBox()
-                                sendMessToServer()
-                                onClickSendEvent().call()
-                                FirebaseReferenceInstance.removeEventGetBoxByIdUser(chatViewData.user.id, this)
-                            }
-
-                        }
-
-                    })
-
+                createNewBox()
             }
         }
     }
@@ -203,18 +176,27 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
     }
 
     fun createNewBox() {
-        Log.e("Rio ", "boxs null:-->create new box  ")
-//        chatViewData.mainBox.id = FirebaseReferenceInstance.getBoxsReference().push().key.toString()
 
         chatViewData.mainBox.members = arrayListOf(chatViewData.user.id, chatViewData.userReceive.id)
 
+        val mess = Message()
+        mess.contentMess = chatViewData.contentMess
+        mess.sendTime = AppConstants.getTimeNow()
+        mess.stastus = "sent"
+        mess.idUser = chatViewData.user.id
+        mess.type = "text"
+        mess.id = FirebaseReferenceInstance.getSingleChatBoxsReference().child(chatViewData.user.id).child(chatViewData.userReceive.id).push().key.toString()
+        onClickSendEvent().call()
+        onGetListChatSuccessEvent().call()
+
         FirebaseReferenceInstance.createSingleBox(
-//            chatViewData.mainBox.id,
             chatViewData.user,
-            chatViewData.userReceive
+            chatViewData.userReceive, mess
         )
         chatViewData.isHadBox = true
+
     }
+
 
     fun sendMessToServer() {
         val mess = Message()
@@ -223,12 +205,12 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
         mess.stastus = "sent"
         mess.idUser = chatViewData.user.id
         mess.type = "text"
-        chatViewData.listChat.add(mess)
-        onAddMessEvent().call()
-        mess.id=FirebaseReferenceInstance.getMessagesReference().push().key.toString()
-        for (id in 0 until chatViewData.mainBox.members.size) {
-            FirebaseReferenceInstance.createMessage(chatViewData.mainBox.members[id], mess)
-        }
+        mess.id = FirebaseReferenceInstance.getSingleChatBoxsReference().child(chatViewData.user.id)
+            .child(chatViewData.userReceive.id).push().key.toString()
+//        onAddMessEvent().call()
+        onClickSendEvent().call()
+        Log.e("Rio ", "sendMessToServer 001 :"+  mess.toString())
+        FirebaseReferenceInstance.createMessage(chatViewData.user.id, chatViewData.userReceive.id, mess)
     }
 
     fun getIdUserLogin() {

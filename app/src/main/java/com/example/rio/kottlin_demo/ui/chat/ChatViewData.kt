@@ -7,7 +7,6 @@ import com.example.rio.kottlin_demo.ui.base.BaseViewData
 
 class ChatViewData:BaseViewData(){
 
-    var listChat= arrayListOf<Message>()
     var mainBox=Box()
     var userReceive= User()
     var contentMess=""
