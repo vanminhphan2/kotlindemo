@@ -4,7 +4,6 @@ import com.example.rio.kottlin_demo.ui.base.BaseViewData
 
 class LoginViewData:BaseViewData(){
 
-    var message:String=""
     var idUser:String=""
     var phone:String=""
     var name:String=""

@@ -26,7 +26,7 @@ abstract class BaseViewModel<T:Any>:ViewModel(){
     }
 
     fun disposeAll() {
-        if (disposable != null && disposable.size() > 0) {
+        if (disposable.size() > 0) {
             disposable.clear()
         }
     }

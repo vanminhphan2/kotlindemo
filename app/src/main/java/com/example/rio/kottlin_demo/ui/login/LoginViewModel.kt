@@ -77,17 +77,17 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
 
                     var phoneIsSuccess = false
                     var passIsSuccess = false
-                    var u: User? = null
+                    var u= User()
                     for (snapshot in dataSnapshot.getChildren()) {
                         if (loginViewData.phone.equals(snapshot.child("phone").value)) {
                             phoneIsSuccess = true
                             if (loginViewData.pass.equals(snapshot.child("pass").value)) {
                                 passIsSuccess = true
-                                u = ConvertData.convertSnapshotToUser(snapshot)
+//                                u = ConvertData.convertSnapshotToUser(snapshot)
                             }
                         }
                     }
-                    if (phoneIsSuccess && passIsSuccess && u != null) {
+                    if (phoneIsSuccess && passIsSuccess) {
                         val token = AppConstants.generateTokenString()
                         FirebaseReferenceInstance.getSessionsReference().child(token).setValue(loginViewData.phone)
                         appDataManager.setLoginToken(token)

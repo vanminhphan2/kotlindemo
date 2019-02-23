@@ -40,9 +40,9 @@ abstract class BaseActivity<V : Any> : AppCompatActivity(), HasSupportFragmentIn
         super.onCreate(savedInstanceState)
         AndroidInjection.inject(this)
         loadingDialog= Dialog(this)
-        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        loadingDialog.setContentView(R.layout.dialog_loading);
-        loadingDialog.getWindow().setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        loadingDialog.setContentView(R.layout.dialog_loading)
+        loadingDialog.window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
     protected abstract fun getViewReferences()
@@ -54,17 +54,15 @@ abstract class BaseActivity<V : Any> : AppCompatActivity(), HasSupportFragmentIn
     protected abstract fun initData()
 
     fun showLoading() {
-        if (loadingDialog != null)
-            loadingDialog.show()
+        loadingDialog.show()
     }
 
     fun hideLoading() {
-        if (loadingDialog != null)
-            loadingDialog.hide()
+        loadingDialog.hide()
     }
 
     public override fun onDestroy() {
-        if (loadingDialog != null && loadingDialog.isShowing()) {
+        if (loadingDialog.isShowing) {
             loadingDialog.cancel()
         }
         super.onDestroy()

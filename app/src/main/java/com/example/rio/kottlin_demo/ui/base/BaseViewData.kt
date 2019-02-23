@@ -4,4 +4,5 @@ import com.example.rio.kottlin_demo.data.model.User
 
 abstract class BaseViewData{
     var user= User()
+    var message:String=""
 }

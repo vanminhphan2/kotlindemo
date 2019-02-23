@@ -37,10 +37,6 @@ object FirebaseReferenceInstance {
         return getDatabase().child("SingleChatBoxs")
     }
 
-//    fun getMessagesReference():DatabaseReference{
-//        return getDatabase().child("Messages")
-//    }
-
     fun createUserAccount(idUser:String,phone:String){
 
         getUsersReference().child(idUser).child("phone").setValue(phone)

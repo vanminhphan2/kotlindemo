@@ -5,7 +5,7 @@ import com.example.rio.kottlin_demo.ui.base.BaseViewData
 class SplashViewData:BaseViewData(){
     var phone :String = ""
     var password = ""
-    var authToken = ""
+    var loginToken = ""
     var isLogged=false
 
 

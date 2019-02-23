@@ -97,7 +97,7 @@ class RegisterActivity : BaseActivity<RegisterViewModel>() {
                     if (task.isSuccessful) {
 
                         Log.e("Rio", "task.isSuccessful  id: "+ firebaseAuth.getCurrentUser()!!.uid)
-                        viewModel.registerViewData.idUser = firebaseAuth.getCurrentUser()!!.uid
+                        viewModel.registerViewData.user.id = firebaseAuth.getCurrentUser()!!.uid
                         viewModel.verifySuccess()
                     } else {
                         hideLoading()

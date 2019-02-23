@@ -3,6 +3,7 @@ package com.example.rio.kottlin_demo.ui.register
 import android.text.Editable
 import android.util.Log
 import com.example.rio.kottlin_demo.data.AppDataManager
+import com.example.rio.kottlin_demo.data.firebase.FirebaseFirestoreInstance
 import com.example.rio.kottlin_demo.data.firebase.FirebaseReferenceInstance
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
@@ -20,13 +21,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 
-class RegisterViewModel @Inject constructor(private var appDataManager: AppDataManager) : BaseViewModel<RegisterViewData>(){
+class RegisterViewModel @Inject constructor(private var appDataManager: AppDataManager) :
+    BaseViewModel<RegisterViewData>() {
 
-    var registerViewData:RegisterViewData
-//    val database = FirebaseDatabase.getInstance()
-//    val myRef = database.getReference("users")
-//    val myRefSession = database.getReference("sessions")
-
+    var registerViewData: RegisterViewData
     private val onRegisterClick: SingleLiveEvent<Void>
     private val onVerifyCode: SingleLiveEvent<Void>
     private val onReceiveCode: SingleLiveEvent<Void>
@@ -44,59 +42,35 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
     }
 
     init {
-        registerViewData= RegisterViewData()
+        registerViewData = RegisterViewData()
         setDataView()
-        onRegisterClick= SingleLiveEvent()
-        onShowMessage= SingleLiveEvent()
-        onVerifyCode= SingleLiveEvent()
-        onReceiveCode= SingleLiveEvent()
+        onRegisterClick = SingleLiveEvent()
+        onShowMessage = SingleLiveEvent()
+        onVerifyCode = SingleLiveEvent()
+        onReceiveCode = SingleLiveEvent()
     }
 
-    fun setDataView(){
+    fun setDataView() {
         viewData.setValue(registerViewData)
     }
 
-    fun onRegisterClick(){
-        if(registerViewData.name.length<3)
-        {
-            registerViewData.message="Name is incorrect!"
-            onShowMessageEvent().call()
-        }else if(registerViewData.pass.length<6){
-            registerViewData.message="Pass is incorrect!"
-            onShowMessageEvent().call()
-        }else{
-//            myRef.child(registerViewData.idUser).child("isUpdateInfo").setValue(true)
-//            myRef.child(registerViewData.idUser).child("name").setValue(registerViewData.name)
-//            myRef.child(registerViewData.idUser).child("pass").setValue(registerViewData.pass)
-//            myRef.child(registerViewData.idUser).child("forceResendingToken").setValue(registerViewData.forceResendingToken)
-            val user=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
-            val token=AppConstants.generateTokenString()
-//            myRefSession.child(token).setValue(registerViewData.phone)
-            FirebaseReferenceInstance.updateUserAccount(user)
-            FirebaseReferenceInstance.createLoginToken(token,registerViewData.phone)
-            appDataManager.setLoginToken(token)
-//            registerViewData.user=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
-//            MyApp.myApp.userProfile=User(registerViewData.idUser,registerViewData.name,registerViewData.phone,registerViewData.pass)
-            onRegisterSuccessEvent().call()
-        }
-    }
+    fun onGetVerifyCodeClick() {
 
-    fun onGetVerifyCodeClick(){
-
-        if(registerViewData.phone.isEmpty() || registerViewData.phone.length < 10){
-            registerViewData.message="phone is incorrect"
+        if (registerViewData.user.phone.isEmpty() || registerViewData.user.phone.length < 10) {
+            registerViewData.message = "phone is incorrect"
             updateViewData(registerViewData)
             onShowMessageEvent().call()
-        }else{
+        } else {
             showLoading()
-            Log.e("Rio", "onGetVerifyCodeClick  :"+registerViewData.code)
-           checkExitsPhoneOnServer()
+            Log.e("Rio", "onGetVerifyCodeClick  :" + registerViewData.code)
+//           checkExitsPhoneOnServer()
+            checkExitsPhoneOnFireStore()
         }
 
     }
 
-    fun onCheckCodeClick(){
-        Log.e("Rio", "onCheckCodeClick  :"+registerViewData.code)
+    fun onCheckCodeClick() {
+        Log.e("Rio", "onCheckCodeClick  :" + registerViewData.code)
         showLoading()
         onVerifyCodeEvent().call()
 
@@ -104,7 +78,7 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
 
     private fun sendVerificationCode() {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
-            "+84${registerViewData.phone}]",
+            "+84${registerViewData.user.phone}]",
             60,
             TimeUnit.SECONDS,
             TaskExecutors.MAIN_THREAD,
@@ -116,11 +90,11 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
         override fun onVerificationCompleted(phoneAuthCredential: PhoneAuthCredential) {
             //Getting the code sent by SMS
             val code = phoneAuthCredential.smsCode
-            Log.e("Rio", "mCallbacks  :"+code)
+            Log.e("Rio", "mCallbacks  :" + code)
             if (code != null) {
-                registerViewData.code=code
+                registerViewData.code = code
                 updateViewData(registerViewData)
-                Log.e("Rio", "code != null  :"+code)
+                Log.e("Rio", "code != null  :" + code)
                 onReceiveCodeEvent().call()
                 hideLoading()
             }
@@ -128,16 +102,16 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
 
         override fun onVerificationFailed(e: FirebaseException) {
 
-            Log.e("Rio", "onVerificationFailed :"+e.message)
+            Log.e("Rio", "onVerificationFailed :" + e.message)
             //the the phone number format is not valid
             hideLoading()
             if (e is FirebaseAuthInvalidCredentialsException) {
                 // Invalid request
-                registerViewData.message="the the phone number format is not valid"
+                registerViewData.message = "the the phone number format is not valid"
                 updateViewData(registerViewData)
             } else if (e is FirebaseTooManyRequestsException) {
                 // The SMS quota for the project has been exceeded
-                registerViewData.message="The SMS quota for the project has been exceeded"
+                registerViewData.message = "The SMS quota for the project has been exceeded"
                 updateViewData(registerViewData)
             }
 
@@ -148,44 +122,44 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
             super.onCodeSent(s, forceResendingToken)
 
 
-            registerViewData.isEnabledEtPhone=false
-            registerViewData.isVisibilityBtnGetCode=false
-            registerViewData.isVisibilityEtCode=true
-            registerViewData.isVisibilityBtnCheckCode=true
+            registerViewData.isEnabledEtPhone = false
+            registerViewData.isVisibilityBtnGetCode = false
+            registerViewData.isVisibilityEtCode = true
+            registerViewData.isVisibilityBtnCheckCode = true
             registerViewData.verificationId = s!!
             registerViewData.forceResendingToken = forceResendingToken.toString()
 
-            registerViewData.message="The SMS verification code has been sent to the provided phone number"
+            registerViewData.message = "The SMS verification code has been sent to the provided phone number"
             updateViewData(registerViewData)
             hideLoading()
-            Log.e("Rio", "onCodeSent  registerViewData.verificationId :"+ registerViewData.verificationId )
-            Log.e("Rio", "onCodeSent  registerViewData.forceResendingToken :"+ registerViewData.forceResendingToken )
+            Log.e("Rio", "onCodeSent  registerViewData.verificationId :" + registerViewData.verificationId)
+            Log.e("Rio", "onCodeSent  registerViewData.forceResendingToken :" + registerViewData.forceResendingToken)
         }
     }
 
-    fun checkExitsPhoneOnServer(){
+    fun checkExitsPhoneOnServer() {
+
         FirebaseReferenceInstance.getUsersReference().addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.getValue() != null){
+                if (dataSnapshot.getValue() != null) {
 
-                    var isExits=false
-                    for ( postSnapshot in dataSnapshot.getChildren()) {
-                        if(registerViewData.phone.equals(postSnapshot.child("phone").value)){
-                            isExits=true
+                    var isExits = false
+                    for (postSnapshot in dataSnapshot.getChildren()) {
+                        if (registerViewData.user.phone.equals(postSnapshot.child("phone").value)) {
+                            isExits = true
                         }
                     }
-                    if(isExits){
-                        registerViewData.message="Phone is exits!"
+                    if (isExits) {
+                        registerViewData.message = "Phone is exits!"
                         hideLoading()
                         onShowMessageEvent().call()
                         Log.e("Rio", "Phone is exits")
-                    }
-                    else{
+                    } else {
                         sendVerificationCode()
 
                         Log.e("Rio", "Phone is ok")
                     }
-                }else{
+                } else {
                     Log.e("Rio", "dataSnapshot.getValue() null")
 
                 }
@@ -200,34 +174,121 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
 
     }
 
-    fun verifySuccess(){
-        registerViewData.isVisibilityEtCode=false
-        registerViewData.isVisibilityBtnCheckCode=false
-        registerViewData.isVisibilityEtNameCode=true
-        registerViewData.isVisibilityEtPassCode=true
-        registerViewData.isVisibilityBtnRegister=true
-        updateViewData(registerViewData)
-//        myRef.child(registerViewData.idUser).child("phone").setValue(registerViewData.phone)
-//        myRef.child(registerViewData.idUser).child("isUpdateInfo").setValue(false)
-        FirebaseReferenceInstance.createUserAccount(registerViewData.idUser,registerViewData.phone)
-        appDataManager.setUserId(registerViewData.idUser)
-        hideLoading()
+    fun checkExitsPhoneOnFireStore() {
+
+
+        FirebaseFirestoreInstance.getUserByPhone(registerViewData.user.phone)
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+
+                    Log.e("Rio", "Phone chua dk, co the dung")
+//                    sendVerificationCode()
+                    verifySuccess()
+
+                } else {
+                    registerViewData.message = "Phone is exits!"
+                    hideLoading()
+                    onShowMessageEvent().call()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Rio", "checkExitsPhoneOnFireStore  error: " + exception.message)
+
+            }
+
     }
 
+    fun verifySuccess() {
+        registerViewData.isVisibilityBtnGetCode = false
+        registerViewData.isVisibilityEtCode = false
+        registerViewData.isVisibilityBtnCheckCode = false
+        registerViewData.isVisibilityEtNameCode = true
+        registerViewData.isVisibilityEtPassCode = true
+        registerViewData.isVisibilityBtnRegister = true
+
+        updateViewData(registerViewData)
+//        createAccToRealTimeDb()
+        createAccToFireStore()
+    }
+
+    fun createAccToRealTimeDb() {
+        FirebaseReferenceInstance.createUserAccount(registerViewData.user.id, registerViewData.user.phone)
+    }
+
+    fun createAccToFireStore() {
+
+        registerViewData.user.id = FirebaseFirestoreInstance.getUserCollection().document().id  //id temp
+        FirebaseFirestoreInstance.createUserAccount(registerViewData.user.id, registerViewData.user.phone)
+            .addOnSuccessListener {
+                appDataManager.setUserId(registerViewData.user.id)
+                Log.e("Rio", "createAccToFireStore : ok ")
+                hideLoading()
+            }
+            .addOnFailureListener { e ->
+                registerViewData.message = e.message.toString()
+                onShowMessageEvent().call()
+                hideLoading()
+                Log.e("Rio", "Error getting documents: ", e)
+            }
+    }
+
+    fun onRegisterClick() {
+        if (registerViewData.user.name.length < 3) {
+            registerViewData.message = "Name is incorrect!"
+            onShowMessageEvent().call()
+        } else if (registerViewData.user.pass.length < 6) {
+            registerViewData.message = "Pass is incorrect!"
+            onShowMessageEvent().call()
+        } else {
+//            registerUserToRealTimeDb()
+            registerUserToFireStore()
+        }
+    }
+
+    fun registerUserToRealTimeDb() {
+        registerViewData.user.loginToken = AppConstants.generateTokenString()
+        FirebaseReferenceInstance.updateUserAccount(registerViewData.user)
+        FirebaseReferenceInstance.createLoginToken(registerViewData.user.loginToken, registerViewData.user.phone)
+        appDataManager.setLoginToken(registerViewData.user.loginToken)
+        onRegisterSuccessEvent().call()
+    }
+
+    fun registerUserToFireStore() {
+        registerViewData.user.loginToken = AppConstants.generateTokenString()
+        registerViewData.user.isUpdateInfo = true
+        registerViewData.user.isOnline = true
+        registerViewData.user.maritalStatus = "doc than"
+        registerViewData.user.avatar = "chua co ava"
+        registerViewData.user.timeCreate = AppConstants.getTimeNow()
+        registerViewData.user.timeUpdate = registerViewData.user.timeCreate
+        FirebaseFirestoreInstance.updateUserAccount(registerViewData.user)
+        FirebaseFirestoreInstance.createLoginToken(registerViewData.user.loginToken)
+            .addOnSuccessListener {
+                appDataManager.setLoginToken(registerViewData.user.loginToken)
+                appDataManager.setUserId(registerViewData.user.id)
+                onRegisterSuccessEvent().call()
+            }
+            .addOnFailureListener { e ->
+                registerViewData.message = e.message.toString()
+                onShowMessageEvent().call()
+                hideLoading()
+                Log.e("Rio", "Error getting documents: ", e)
+            }
+    }
 
     fun updatePhone(phone: Editable) {
-        registerViewData.phone=phone.toString()
+        registerViewData.user.phone = phone.toString()
     }
 
     fun updateName(name: Editable) {
-        registerViewData.name=name.toString()
+        registerViewData.user.name = name.toString()
     }
 
     fun updatePass(pass: Editable) {
-        registerViewData.pass=pass.toString()
+        registerViewData.user.pass = pass.toString()
     }
 
     fun updateCode(code: Editable) {
-        registerViewData.code=code.toString()
+        registerViewData.code = code.toString()
     }
 }

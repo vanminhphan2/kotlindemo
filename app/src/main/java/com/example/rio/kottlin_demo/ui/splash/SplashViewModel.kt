@@ -2,6 +2,7 @@ package com.example.rio.kottlin_demo.ui.splash
 
 import android.util.Log
 import com.example.rio.kottlin_demo.data.AppDataManager
+import com.example.rio.kottlin_demo.data.firebase.FirebaseFirestoreInstance
 import com.example.rio.kottlin_demo.data.firebase.FirebaseReferenceInstance
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
@@ -12,6 +13,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class SplashViewModel @Inject constructor(private var appDataManager: AppDataManager) :
@@ -41,33 +44,55 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
     }
 
     fun checkLogin() {
-        Log.e("Rio", "token local: "+appDataManager.getLoginToken())
-        if(appDataManager.getLoginToken().equals("")||appDataManager.getLoginToken()==null){
+
+        splashViewData.loginToken=appDataManager.getLoginToken().toString()
+        if(splashViewData.loginToken.equals("")){
             getToLoginEvent().call()
         }
         else{
-            var phone:String
-
-            FirebaseReferenceInstance.checkPhoneByToken(appDataManager.getLoginToken().toString()).addValueEventListener(object :ValueEventListener{
-                override fun onCancelled(p0: DatabaseError) {
-                   Log.e("Rio ","loi get data m01: "+ p0.message)
-                }
-
-                override fun onDataChange(p0: DataSnapshot) {
-                    if (p0.getValue() != null) {
-                       phone = p0.getValue().toString()
-                        Log.e("Rio ","login = token va phone = "+ p0.getValue().toString())
-                        getInfoUser(phone)
-                    }
-                    else{
-                        Log.e("Rio ","to login because have not token!")
-                        getToLoginEvent().call()
-                    }
-                    FirebaseReferenceInstance.removeListener(FirebaseReferenceInstance.getSessionsReference(),this);
-                }
-
-            })
+            checkLoginOnFireStore()
         }
+    }
+
+    fun checkLoginOnFireStore(){
+
+        FirebaseFirestoreInstance.getLoginToken(splashViewData.loginToken)
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Log.e("Rio ","to login because have not token!")
+                    getToLoginEvent().call()
+                } else {
+                    getInfoUser()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Rio", "checkExitsPhoneOnFireStore  error: " + exception.message)
+
+            }
+    }
+
+    fun checkLoginOnRealTimeDb(){
+
+        var phone:String
+        FirebaseReferenceInstance.checkPhoneByToken(splashViewData.loginToken).addValueEventListener(object :ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+                Log.e("Rio ","loi get data m01: "+ p0.message)
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.getValue() != null) {
+                    phone = p0.getValue().toString()
+                    Log.e("Rio ","login = token = "+ p0.getValue().toString())
+                    getInfoUser(phone)
+                }
+                else{
+                    Log.e("Rio ","to login because have not token!")
+                    getToLoginEvent().call()
+                }
+                FirebaseReferenceInstance.removeListener(FirebaseReferenceInstance.getSessionsReference(),this);
+            }
+
+        })
     }
 
     fun getInfoUser(phone:String){
@@ -82,7 +107,7 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
                 Log.e("Rio ","login "+ p0.toString())
                 if (p0.getValue() != null) {
                     Log.e("Rio ","login success have a info user:  "+ p0.getValue().toString())
-                    splashViewData.user=ConvertData.convertDataSnapshotToUser(p0)
+//                    splashViewData.user=ConvertData.convertDataSnapshotToUser(p0)
                     getToMainEvent().call()
                 }
                 else{
@@ -94,5 +119,35 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
             }
 
         })
+    }
+
+
+    fun getInfoUser(){
+
+        FirebaseFirestoreInstance.getUserByLoginToken(splashViewData.loginToken)
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Log.e("Rio ","get user null!")
+                    getToLoginEvent().call()
+                } else {
+                    for (document in documents) {
+
+                        disposable.add(appDataManager.insertUser(document.toObject(User::class.java))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({ u: User ->
+                                Log.e("Rio", "login = token ok  : " + u.toString())
+                                getToMainEvent().call()
+                            }, { throwable ->
+                                Log.e("Rio", "save user fails: "+throwable.message)
+                            })
+                        )
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Rio", "checkExitsPhoneOnFireStore  error: " + exception.message)
+
+            }
     }
 }
