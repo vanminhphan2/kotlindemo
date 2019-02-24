@@ -17,9 +17,6 @@ data class Box(
     @SerializedName("name")
     @Expose var name:String="",
     @ColumnInfo
-    @SerializedName("members")
-    @Expose var members: ArrayList<String> = arrayListOf(),
-    @ColumnInfo
     @SerializedName("type")
     @Expose var type:String="",
     @ColumnInfo
@@ -29,7 +26,13 @@ data class Box(
     @SerializedName("avatar")
     @Expose var avatar:String="",
     @ColumnInfo
-    @SerializedName("listMessage")
-    @Expose var listMessage: ArrayList<Message> =arrayListOf()
+    @SerializedName("idListMessage")
+    @Expose var idListMessage:String ="",
+    @ColumnInfo
+    @SerializedName("isBlock")
+    @Expose var isBlock:Boolean=false,
+    @ColumnInfo
+    @SerializedName("members")
+    @Expose var members:ArrayList<String> = arrayListOf()
 ):
     Serializable

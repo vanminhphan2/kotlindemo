@@ -8,7 +8,12 @@ import com.example.rio.kottlin_demo.ui.base.BaseViewData
 class ChatViewData:BaseViewData(){
 
     var mainBox=Box()
+    var boxReceive=Box()
+    var listMess= arrayListOf<Message>()
+    var idListMessageReceive=""
     var userReceive= User()
     var contentMess=""
+    var messSent=Message()
+    var messReceive=Message()
     var isHadBox=false
 }

@@ -80,7 +80,7 @@ class BoxsViewModel @Inject constructor(private var appDataManager: AppDataManag
                                     val mess = itemMess.getValue(Message::class.java)
                                     if (mess != null) {
                                         mess.id = itemMess.key.toString()
-                                        box.listMessage.add(mess)
+//                                        box.listMessage.add(mess)
                                     }
                                 }
                                 box.id = item.key.toString()

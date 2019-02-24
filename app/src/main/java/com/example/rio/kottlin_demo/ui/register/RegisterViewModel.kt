@@ -216,9 +216,8 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
     }
 
     fun createAccToFireStore() {
-
-        registerViewData.user.id = FirebaseFirestoreInstance.getUserCollection().document().id  //id temp
-        FirebaseFirestoreInstance.createUserAccount(registerViewData.user.id, registerViewData.user.phone)
+        registerViewData.user.id = FirebaseFirestoreInstance.getUserCollection().document().id //id temp
+        FirebaseFirestoreInstance.createUserAccount(registerViewData.user)
             .addOnSuccessListener {
                 appDataManager.setUserId(registerViewData.user.id)
                 Log.e("Rio", "createAccToFireStore : ok ")
@@ -230,6 +229,7 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
                 hideLoading()
                 Log.e("Rio", "Error getting documents: ", e)
             }
+
     }
 
     fun onRegisterClick() {
@@ -262,11 +262,11 @@ class RegisterViewModel @Inject constructor(private var appDataManager: AppDataM
         registerViewData.user.timeCreate = AppConstants.getTimeNow()
         registerViewData.user.timeUpdate = registerViewData.user.timeCreate
         FirebaseFirestoreInstance.updateUserAccount(registerViewData.user)
-        FirebaseFirestoreInstance.createLoginToken(registerViewData.user.loginToken)
+        FirebaseFirestoreInstance.createLoginToken(registerViewData.user)
             .addOnSuccessListener {
                 appDataManager.setLoginToken(registerViewData.user.loginToken)
                 appDataManager.setUserId(registerViewData.user.id)
-                onRegisterSuccessEvent().call()
+                    onRegisterSuccessEvent().call()
             }
             .addOnFailureListener { e ->
                 registerViewData.message = e.message.toString()

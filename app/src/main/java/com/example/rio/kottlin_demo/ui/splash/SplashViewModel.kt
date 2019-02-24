@@ -45,7 +45,9 @@ class SplashViewModel @Inject constructor(private var appDataManager: AppDataMan
 
     fun checkLogin() {
 
+
         splashViewData.loginToken=appDataManager.getLoginToken().toString()
+        Log.e("Rio", "  splashViewData.loginToken: "+ splashViewData.loginToken)
         if(splashViewData.loginToken.equals("")){
             getToLoginEvent().call()
         }

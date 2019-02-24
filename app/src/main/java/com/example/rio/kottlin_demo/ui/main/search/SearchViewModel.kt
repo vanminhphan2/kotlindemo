@@ -2,6 +2,7 @@ package com.example.rio.kottlin_demo.ui.main.search
 
 import android.util.Log
 import com.example.rio.kottlin_demo.data.AppDataManager
+import com.example.rio.kottlin_demo.data.firebase.FirebaseFirestoreInstance
 import com.example.rio.kottlin_demo.data.firebase.FirebaseReferenceInstance
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
@@ -34,6 +35,13 @@ class SearchViewModel @Inject constructor(private var appDataManager: AppDataMan
         viewData.setValue(searchViewData)
     }
 
+    fun checkIsLoginId(id: String): Boolean {
+
+        if (id.equals(appDataManager.getUserId()))
+            return false
+        return true
+    }
+
     fun getListUser() {
         FirebaseReferenceInstance.getUsersReference().addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -54,9 +62,22 @@ class SearchViewModel @Inject constructor(private var appDataManager: AppDataMan
         })
     }
 
-    fun checkIsLoginId(id: String): Boolean {
-        if (id.equals(appDataManager.getUserId()))
-            return false
-        return true
+
+    fun getListUserFromFireStore() {
+        FirebaseFirestoreInstance.getUserCollection().get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Log.e("Rio ", "getListUserFromFireStore null")
+                } else {
+                    for (document in documents) {
+                        searchViewData.listUser.add(document.toObject(User::class.java))
+//                        Log.e("Rio ", "list data user--> " + searchViewData.listUser.toString())
+                        getUpdateListUserEvent().call()
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Rio", "getListUserFromFireStore  error: " + exception.message)
+            }
     }
 }

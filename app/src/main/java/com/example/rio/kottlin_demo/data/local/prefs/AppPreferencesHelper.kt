@@ -25,7 +25,7 @@ class AppPreferencesHelper @Inject constructor(context: Context, @PreferenceInfo
         return mPrefs.getString(PREF_KEY_PHONE, null)
     }
 
-    override fun setPhone(phone: String?) {
+    override fun setPhone(phone: String) {
         mPrefs.edit().putString(PREF_KEY_PHONE, phone).apply()
     }
 
@@ -33,7 +33,7 @@ class AppPreferencesHelper @Inject constructor(context: Context, @PreferenceInfo
         return mPrefs.getString(PREF_KEY_PASS, null)
     }
 
-    override fun setPass(pass: String?) {
+    override fun setPass(pass: String) {
         mPrefs.edit().putString(PREF_KEY_PASS, pass).apply()
     }
 
@@ -41,7 +41,7 @@ class AppPreferencesHelper @Inject constructor(context: Context, @PreferenceInfo
         return mPrefs.getString(PREF_KEY_TOKEN, null)
     }
 
-    override fun setLoginToken(token: String?) {
+    override fun setLoginToken(token: String) {
         mPrefs.edit().putString(PREF_KEY_TOKEN, token).apply()
     }
 
@@ -49,7 +49,7 @@ class AppPreferencesHelper @Inject constructor(context: Context, @PreferenceInfo
         return mPrefs.getString(PREF_KEY_USER_ID, null)
     }
 
-    override fun setUserId(id: String?) {
+    override fun setUserId(id: String) {
         mPrefs.edit().putString(PREF_KEY_USER_ID, id).apply()
     }
 }

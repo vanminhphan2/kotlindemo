@@ -27,23 +27,23 @@ object ConvertData {
 //        )
 //    }
 
-    fun convertSnapshotToBox(snapshot: DataSnapshot): Box {
-        val list = ArrayList<String>()
-        val listMember = convertDataSnapshotToListMember(snapshot.child("members"))
-        val listMess = convertDataSnapshotToListMessage(snapshot.child("listMess"))
-        for (i in 0..(listMember.size - 1)) {
-            list.add(listMember[i])
-        }
-        return Box(
-            snapshot.key.toString(),
-            snapshot.child("name").value.toString(),
-            list,
-            snapshot.child("type").value.toString(),
-            snapshot.child("content").value.toString(),
-            snapshot.child("avatar").value.toString(),
-            listMess
-        )
-    }
+//    fun convertSnapshotToBox(snapshot: DataSnapshot): Box {
+//        val list = ArrayList<String>()
+//        val listMember = convertDataSnapshotToListMember(snapshot.child("members"))
+//        val listMess = convertDataSnapshotToListMessage(snapshot.child("listMess"))
+//        for (i in 0..(listMember.size - 1)) {
+//            list.add(listMember[i])
+//        }
+//        return Box(
+//            snapshot.key.toString(),
+//            snapshot.child("name").value.toString(),
+//            list,
+//            snapshot.child("type").value.toString(),
+//            snapshot.child("content").value.toString(),
+//            snapshot.child("avatar").value.toString(),
+//            listMess
+//        )
+//    }
 
 
     fun convertDataSnapshotToArrUser(snapshot: DataSnapshot): ArrayList<User> {
@@ -69,24 +69,24 @@ object ConvertData {
         return list
     }
 
-    fun convertDataSnapshotToListBox(snapshot: DataSnapshot): ArrayList<Box> {
-        val list = ArrayList<Box>()
-        for (item in snapshot.children) {
-            val listMember = convertDataSnapshotToListMember(item.child("members"))
-            val listMess = convertDataSnapshotToListMessage(item.child("listMess"))
-            val box = Box(
-                item.key.toString(),
-                item.child("name").getValue().toString(),
-                listMember,
-                item.child("type").getValue().toString(),
-                item.child("content").getValue().toString(),
-                item.child("avatar").getValue().toString(),
-                listMess
-            )
-            list.add(box)
-        }
-        return list
-    }
+//    fun convertDataSnapshotToListBox(snapshot: DataSnapshot): ArrayList<Box> {
+//        val list = ArrayList<Box>()
+//        for (item in snapshot.children) {
+//            val listMember = convertDataSnapshotToListMember(item.child("members"))
+//            val listMess = convertDataSnapshotToListMessage(item.child("listMess"))
+//            val box = Box(
+//                item.key.toString(),
+//                item.child("name").getValue().toString(),
+//                listMember,
+//                item.child("type").getValue().toString(),
+//                item.child("content").getValue().toString(),
+//                item.child("avatar").getValue().toString(),
+//                listMess
+//            )
+//            list.add(box)
+//        }
+//        return list
+//    }
 
     fun convertDataSnapshotToBox(box: Box,snapshot: DataSnapshot): Box {
 
@@ -94,7 +94,7 @@ object ConvertData {
                 val mess = itemMess.getValue(Message::class.java)
                 if (mess != null) {
                     mess.id = itemMess.key.toString()
-                    box.listMessage.add(mess)
+//                    box.listMessage.add(mess)
                 }
             }
             box.id = snapshot.key.toString()

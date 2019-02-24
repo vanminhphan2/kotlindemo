@@ -78,7 +78,8 @@ class SearchFragment : BaseFragment<SearchViewModel>() {
     }
 
     override fun observeDataChange() {
-       viewModel.getListUser()
+//       viewModel.getListUser()
+        viewModel.getListUserFromFireStore()
     }
 
 }

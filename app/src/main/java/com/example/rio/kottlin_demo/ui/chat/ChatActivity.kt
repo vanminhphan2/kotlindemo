@@ -36,7 +36,7 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
 
         viewModel.getIdUserLogin()
         val layoutManager = LinearLayoutManager(applicationContext)
-        listChatAdapter = ListChatAdapter(viewModel.chatViewData.mainBox.listMessage, applicationContext)
+        listChatAdapter = ListChatAdapter(viewModel.chatViewData.listMess, applicationContext)
         activityChatBinding.rvListContentChat.layoutManager = layoutManager
         activityChatBinding.rvListContentChat.adapter = listChatAdapter
 
@@ -70,12 +70,12 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
         })
 
         viewModel.onGetListChatSuccessEvent().observe(this, Observer {
-            listChatAdapter.setListDataMess(viewModel.chatViewData.mainBox.listMessage, viewModel.chatViewData.user.id)
+            listChatAdapter.setListDataMess(viewModel.chatViewData.listMess, viewModel.chatViewData.user.id)
         })
 
         viewModel.onAddMessEvent().observe(this, Observer {
 
-            activityChatBinding.rvListContentChat.scrollToPosition(viewModel.chatViewData.mainBox.listMessage.size-1);
+            activityChatBinding.rvListContentChat.scrollToPosition(viewModel.chatViewData.listMess.size-1);
         })
     }
 

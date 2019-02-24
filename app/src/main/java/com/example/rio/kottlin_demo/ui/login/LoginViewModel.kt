@@ -3,6 +3,7 @@ package com.example.rio.kottlin_demo.ui.login
 import android.text.Editable
 import android.util.Log
 import com.example.rio.kottlin_demo.data.AppDataManager
+import com.example.rio.kottlin_demo.data.firebase.FirebaseFirestoreInstance
 import com.example.rio.kottlin_demo.data.firebase.FirebaseReferenceInstance
 import com.example.rio.kottlin_demo.data.model.User
 import com.example.rio.kottlin_demo.ui.base.BaseViewModel
@@ -54,7 +55,8 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
             loginViewData.message = "Pass is incorrect!"
             onShowMessageEvent().call()
         } else {
-            onLoginServer()
+//            onLoginRealTimeDbServer()
+            onLoginFireStoreServer()
         }
     }
 
@@ -70,7 +72,7 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
         loginViewData.pass = pass.toString()
     }
 
-    fun onLoginServer() {
+    fun onLoginRealTimeDbServer() {
         FirebaseReferenceInstance.getUsersReference().addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
@@ -129,4 +131,52 @@ class LoginViewModel @Inject constructor(private var appDataManager: AppDataMana
 
     }
 
+    fun onLoginFireStoreServer(){
+        FirebaseFirestoreInstance.getUserByPhoneAndPass(loginViewData.phone,loginViewData.pass)
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    loginViewData.message = "Phone or pass is incorrect!"
+                    Log.e("Rio", "login phone or pass is incorrect!")
+                    hideLoading()
+                    onShowMessageEvent().call()
+                } else {
+                    for (document in documents) {
+                        disposable.add(appDataManager.insertUser(document.toObject(User::class.java))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({ u: User ->
+                                Log.e("Rio", "login = phone ok  : " + u.toString())
+                                loginViewData.user=u
+                                createLoginToken()
+                            }, { throwable ->
+                                Log.e("Rio", "save user fails: "+throwable.message)
+                            })
+                        )
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Rio", "checkExitsPhoneOnFireStore  error: " + exception.message)
+
+            }
+    }
+
+    fun createLoginToken(){
+
+        loginViewData.user.loginToken = AppConstants.generateTokenString()
+        FirebaseFirestoreInstance.createLoginToken(loginViewData.user)
+            .addOnSuccessListener {
+                appDataManager.setLoginToken(loginViewData.user.loginToken)
+                appDataManager.setUserId(loginViewData.user.id)
+                FirebaseFirestoreInstance.updateUserAccount(loginViewData.user)
+                Log.e("Rio", "createLoginToken ok: ")
+                getToMainEvent().call()
+            }
+            .addOnFailureListener { e ->
+                loginViewData.message = e.message.toString()
+                onShowMessageEvent().call()
+                hideLoading()
+                Log.e("Rio", "Error getting documents: ", e)
+            }
+    }
 }
