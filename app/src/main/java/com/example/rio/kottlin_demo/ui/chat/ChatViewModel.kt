@@ -70,22 +70,22 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
 
     }
 
-    fun setData() {
-        disposable.add(
-            appDataManager.getInfoUserLogin(chatViewData.user.id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ u ->
-                    Log.e("Rio ", "get info ok ee :   " + chatViewData.mainBox.toString())
-                    chatViewData.user = u
-                    chatViewData.isHadBox = true
-                    chatViewData.userReceive.id = chatViewData.mainBox.id
-                    getListMessFromFireStore()
-                }, { thow ->
-                    Log.e("Rio ", "loi 01204:   " + thow.message)
-                })
-        )
-    }
+//    fun setData() {
+//        disposable.add(
+//            appDataManager.getInfoUserLogin(chatViewData.user.id)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe({ u ->
+//                    Log.e("Rio ", "get info ok ee :   " + chatViewData.mainBox.toString())
+//                    chatViewData.user = u
+//                    chatViewData.isHadBox = true
+//                    chatViewData.userReceive.id = chatViewData.mainBox.id
+//                    getListMessFromFireStore()
+//                }, { thow ->
+//                    Log.e("Rio ", "loi 01204:   " + thow.message)
+//                })
+//        )
+//    }
 
     private fun getDataBox2User() {
 
@@ -131,19 +131,18 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
                         .addOnSuccessListener { document ->
                             if (document != null && document.exists()) {
                                 chatViewData.boxReceive = document.toObject(Box::class.java)!!
-                                chatViewData.idListMessageReceive = chatViewData.boxReceive.idListMessage
                                 Log.e("Rio ", "boxs 114455:  " + chatViewData.boxReceive.toString())
                                 getListMessFromFireStore()
 
                             } else {
-                                Log.e("Rio ", "getDataBoxFromFireStore documents.isEmpty!")
+                                Log.e("Rio ", "getDataBoxFromFireStore documents.isEmpty 111!")
                             }
                         }
                         .addOnFailureListener { exception ->
                             Log.e("Rio", "checkExitsPhoneOnFireStore  error: " + exception.message)
                         }
                 } else {
-                    Log.e("Rio ", "getDataBoxFromFireStore documents.isEmpty!")
+                    Log.e("Rio ", "getDataBoxFromFireStore documents.isEmpty 222!")
                 }
             }
             .addOnFailureListener { exception ->
@@ -156,8 +155,8 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
         FirebaseFirestoreInstance.getListMess(chatViewData.mainBox.idListMessage)
             .addOnSuccessListener { result ->
                 for (document in result) {
-                    Log.e("Rio", document.id + " => " + document.data)
-                    chatViewData.listMess.add(document.toObject(Message::class.java))
+//                    Log.e("Rio", document.id + " => " + document.data)
+//                    chatViewData.listMess.add(document.toObject(Message::class.java))
                 }
                 onGetListChatSuccessEvent().call()
                 onAddMessEvent().call()
@@ -220,12 +219,13 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
                     Log.e("Rio", "onGetMessFromFireStoreListenerEvent failed.", e)
                     return@EventListener
                 }
-                Log.e("Rio", "dang ki ok")
 
                 for (dc in snapshots!!.documentChanges) {
                     when (dc.type) {
                         DocumentChange.Type.ADDED -> {
+
                             chatViewData.listMess.add(dc.document.toObject(Message::class.java))
+                            Log.e("Rio", "ADDED mess event : "+dc.document.data.getValue("contentMess"))
                             onAddMessEvent().call()
                         }
                         DocumentChange.Type.MODIFIED -> Log.e("Rio", "Modified listMess: " + dc.document.data)
@@ -297,12 +297,13 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
         chatViewData.mainBox.members = arrayListOf()
         chatViewData.mainBox.type = "single"
         boxUserReceive.idListMessage = AppConstants.generateTokenString()
-        chatViewData.idListMessageReceive = boxUserReceive.idListMessage
+        chatViewData.boxReceive.idListMessage  = boxUserReceive.idListMessage
 
 
         FirebaseFirestoreInstance.createSingleBox(chatViewData.user.id, chatViewData.mainBox)
             .addOnSuccessListener {
                 onGetMessFromFireStoreListenerEvent()
+                onGetListChatSuccessEvent().call()
                 FirebaseFirestoreInstance.createSingleBox(chatViewData.userReceive.id, boxUserReceive)
                     .addOnSuccessListener {
                         chatViewData.isHadBox = true
@@ -348,15 +349,15 @@ class ChatViewModel @Inject constructor(private var appDataManager: AppDataManag
         chatViewData.messReceive.sendTime = AppConstants.getTimeNow()
         chatViewData.messReceive.stastus = "sent"
         chatViewData.messReceive.type = "text"
-        chatViewData.messReceive.idUser = chatViewData.idListMessageReceive
+        chatViewData.messReceive.idUser = chatViewData.userReceive.id
         chatViewData.messReceive.id = FirebaseFirestoreInstance.getListMessagesCollection()
-            .document(chatViewData.idListMessageReceive)
-            .collection(chatViewData.idListMessageReceive).document().id
+            .document(chatViewData.boxReceive.idListMessage )
+            .collection(chatViewData.boxReceive.idListMessage ).document().id
 
         FirebaseFirestoreInstance.createSingleMess(chatViewData.mainBox.idListMessage, chatViewData.messSent)
 //            .addOnSuccessListener {
         chatViewData.messSent = Message()
-        FirebaseFirestoreInstance.createSingleMess(chatViewData.idListMessageReceive, chatViewData.messReceive)
+        FirebaseFirestoreInstance.createSingleMess(chatViewData.boxReceive.idListMessage , chatViewData.messReceive)
 //                    .addOnSuccessListener {
         chatViewData.messReceive = Message()
         onClickSendEvent().call()

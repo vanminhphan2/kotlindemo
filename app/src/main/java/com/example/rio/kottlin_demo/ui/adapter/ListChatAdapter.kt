@@ -66,6 +66,8 @@ class ListChatAdapter(private var listData: ArrayList<Message>, var context: Con
 
     override fun getItemViewType(position: Int): Int {
         if (!listData.isEmpty()) {
+
+            Log.e("Rio", "getItemViewType: idUserLogin: "+idUserLogin+"  id user mess:"+listData.get(position).idUser)
             if(listData.get(position).idUser.equals(idUserLogin)){
 
                 return VIEW_TYPE_SEND

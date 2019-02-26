@@ -88,7 +88,7 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
 
             viewModel.chatViewData.mainBox = intent.getSerializableExtra(AppConstants.BOX_CHOOSE) as Box
             activityChatBinding.tvName.setText(viewModel.chatViewData.mainBox.name)
-            viewModel.setData()
+//            viewModel.setData()
         }
     }
 
